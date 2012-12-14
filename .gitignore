@@ -1,0 +1,10 @@
+*~
+.sconsign.dblite
+andr-setup.sh
+lib
+tmp
+*.so
+*.os
+*.root
+*.log
+.tup
