@@ -193,15 +193,12 @@ namespace mu2e {
     const vector<double> planeRotationDegrees(pars.get<vector<double> >("rotation"));
 
     for(unsigned iplane = 0; iplane < zwire.size(); ++iplane) {
-      // wires may not be centered in the drift cells
-      const CLHEP::Hep3Vector wpcenterInParent(0,0, zwire[iplane] - zcenter);
       const double driftZmin = zfoil[iplane]   + 0.5*cathode.get<double>("thickness") - zcenter;
       const double driftZmax = zfoil[iplane+1] - 0.5*cathode.get<double>("thickness") - zcenter;
-
       constructDriftPlane(planeNumberOffset+iplane,
                           detail,
                           planeRotationDegrees[iplane] * CLHEP::degree,
-                          wpcenterInParent,
+                          zwire[iplane] - zcenter,
                           driftZmin,
                           driftZmax,
                           modInfo
@@ -245,7 +242,7 @@ namespace mu2e {
   void MuCapWorld::constructDriftPlane(unsigned globalPlaneNumber,
                                        const ParameterSet& detail,
                                        double planeRotationAngle,
-                                       const CLHEP::Hep3Vector& wirePlaneCenterInParent,
+                                       double zwire,
                                        double driftZmin,
                                        double driftZmax,
                                        const VolumeInfo& parent
@@ -260,6 +257,7 @@ namespace mu2e {
       using namespace CLHEP;
       AntiLeakRegistry& reg = art::ServiceHandle<G4Helper>()->antiLeakRegistry();
       CLHEP::HepRotation *rot = reg.add(new HepRotation(HepRotationZ(-planeRotationAngle)));
+      CLHEP::HepRotation *wireInCellRotation = reg.add(new HepRotation(HepRotationX(90*CLHEP::degree)));
 
       for(unsigned icell=0; icell<ncells; ++icell) {
         const double xmin = dx*(icell -0.5*ncells);
@@ -291,7 +289,7 @@ namespace mu2e {
                                   parent,
                                   1000*globalPlaneNumber + icell, // volume copy number
                                   detail.get<bool>("driftCellVisible"),
-                                  G4Colour::Magenta(),
+                                  G4Colour::Cyan(),
                                   detail.get<bool>("driftCellSolid"),
                                   forceAuxEdgeVisible_,
                                   placePV_,
@@ -299,7 +297,30 @@ namespace mu2e {
                                   )
                           );
 
-      }
+        // FIXME
+        //cellVI.centerInWorld = cellCenterInParent + parent.centerInWorld;
+
+        // Install the wire
+        const ParameterSet wire(detail.get<ParameterSet>("wire"));
+        TubsParams wirePars(0./* rIn */, 0.5*wire.get<double>("diameter"), yHalfSize);
+        ostringstream wirename("wire_");
+        wirename<<std::setw(4)<<std::setfill('0')<<1000*globalPlaneNumber + icell;
+        nestTubs(wirename.str(),
+                 wirePars,
+                 findMaterialOrThrow(wire.get<string>("material")),
+                 wireInCellRotation,
+                 Hep3Vector(0, 0, zwire - cellCenterInParent.z()),
+                 cellVI,
+                 1000*globalPlaneNumber + icell, // copy number
+                 wire.get<bool>("visible"),
+                 G4Colour::Yellow(),
+                 wire.get<bool>("solid"),
+                 forceAuxEdgeVisible_,
+                 placePV_,
+                 doSurfaceCheck_
+                 );
+
+      } //  for(cells)
     }
 
   //================================================================

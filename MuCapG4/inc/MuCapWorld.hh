@@ -35,7 +35,7 @@ namespace mu2e {
     void constructDriftPlane(unsigned globalPlaneNumber,
                              const fhicl::ParameterSet& detail,
                              double planeRotation, // radians
-                             const CLHEP::Hep3Vector& wirePlaneCenterInParent,
+                             double zwire, // in parent
                              double driftZmin, // in parent
                              double driftZmax, // in parent
                              const VolumeInfo& parent

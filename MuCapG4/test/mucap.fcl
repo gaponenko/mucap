@@ -61,7 +61,7 @@ physics : {
                     radius : 169 // mm
                     thickness : 0.00005872 // mm
                     material : G4_MYLAR
-                    visible : true
+                    visible : false
                     solid : false
                 }
 
@@ -72,10 +72,12 @@ physics : {
                     wire : {
                         material : G4_W
                         diameter : 0.015 // 15 um
+                        visible : true
+                        solid : true
                     }
                     moduleBoxVisible : false
                     moduleBoxSolid : false
-                    driftCellVisible : true
+                    driftCellVisible : false
                     driftCellSolid : false
                 }
                 targetModule : {
@@ -85,6 +87,8 @@ physics : {
                     wire : {
                         material : G4_W
                         diameter : 0.015 // 15 um
+                        visible : true
+                        solid : true
                     }
                     target : {
                         radius : 169 // mm
