@@ -155,8 +155,9 @@ namespace mu2e {
 
     const CLHEP::Hep3Vector moduleCenterInParent(0,0,zcenter);
 
-    ostringstream osname("chamberModule_");
-    osname<<std::setw(2)<<std::setfill('0')<<moduleNumber;
+    ostringstream osname;
+    osname<<"chamberModule_"<<std::setw(2)<<std::setfill('0')<<moduleNumber;
+
     VolumeInfo modInfo(nestTubs(osname.str(),
                                 params,
                                 findMaterialOrThrow(detail.get<string>("material")),
@@ -217,8 +218,8 @@ namespace mu2e {
                                  const CLHEP::Hep3Vector& centerInParent,
                                  const VolumeInfo& parent)
   {
-    ostringstream osname("cathode_");
-    osname<<std::setw(2)<<std::setfill('0')<<imodule<<"_"<<ifoil;
+    ostringstream osname;
+    osname<<"cathode_"<<std::setw(2)<<std::setfill('0')<<imodule<<"_"<<ifoil;
 
     TubsParams params(0./* rIn */, foilPars.get<double>("radius"), 0.5*foilPars.get<double>("thickness"));
 
@@ -279,8 +280,8 @@ namespace mu2e {
        const CLHEP::Hep3Vector
          cellCenterInParent(rot->inverse()*CLHEP::Hep3Vector(0.5*(xmax+xmin), 0, 0.5*(driftZmax + driftZmin)));
 
-        ostringstream osname("driftPlane_");
-        osname<<std::setw(2)<<std::setfill('0')<<globalPlaneNumber<<"_"<<icell;
+        ostringstream osname;
+        osname<<"driftPlane_"<<std::setw(2)<<std::setfill('0')<<globalPlaneNumber<<"_"<<icell;
         VolumeInfo cellVI(nestBox(osname.str(),
                                   cellHalfSize,
                                   findMaterialOrThrow(detail.get<string>("material")),
@@ -303,8 +304,8 @@ namespace mu2e {
         // Install the wire
         const ParameterSet wire(detail.get<ParameterSet>("wire"));
         TubsParams wirePars(0./* rIn */, 0.5*wire.get<double>("diameter"), yHalfSize);
-        ostringstream wirename("wire_");
-        wirename<<std::setw(4)<<std::setfill('0')<<1000*globalPlaneNumber + icell;
+        ostringstream wirename;
+        wirename<<"wire_"<<std::setw(5)<<std::setfill('0')<<1000*globalPlaneNumber + icell;
         nestTubs(wirename.str(),
                  wirePars,
                  findMaterialOrThrow(wire.get<string>("material")),
