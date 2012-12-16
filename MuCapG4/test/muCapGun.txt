@@ -1,0 +1,37 @@
+// enable process
+bool particleGun.do = true;
+
+// Limits on cos(polar angle):
+double particleGun.czmin =  -1.;
+double particleGun.czmax =  +1.;
+
+// Limits on phi angle:
+double particleGun.phimin = 0.0;
+double particleGun.phimax = 0.0;
+
+// Time limits in ns, relative to protons on target.
+double particleGun.tmin  =  0.0;
+double particleGun.tmax  =  0.0;
+
+// position
+vector<double> particleGun.point = {0., 0., 0.};
+vector<double> particleGun.halfLength = { 0., 0., 0. };
+
+// Limits on momentum: (MeV)
+double particleGun.pmin = 0.;
+double particleGun.pmax = 20.;
+
+int particleGun.id = 2212;
+
+// Mean particle.
+double particleGun.mean =  -1;
+
+// Control of histograms.
+bool particleGun.doHistograms = true;
+
+bool particleGun.verbose = true;
+
+// This tells emacs to view this file in c++ mode.
+// Local Variables:
+// mode:c++
+// End:

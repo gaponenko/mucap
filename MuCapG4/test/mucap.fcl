@@ -1,0 +1,154 @@
+#include "minimalMessageService.fcl"
+#include "standardProducers.fcl"
+#include "standardServices.fcl"
+
+# Give this job a name.
+process_name : mucap
+
+# Start form an empty source
+source : {
+    module_type : EmptyEvent
+    maxEvents : 10
+}
+
+services : {
+
+    message               : @local::default_message
+    TFileService          : { fileName : "mucap.root" }
+    RandomNumberGenerator : { }
+
+    user : {
+        GeometryService        : { inputFile      : "MuCapG4/test/geom_mucap.txt"  }
+        ConditionsService      : { conditionsfile : "Mu2eG4/test/conditions_01.txt"      }
+        GlobalConstantsService : { inputFile      : "Mu2eG4/test/globalConstants_01.txt" }
+        G4Helper               : { }
+        SeedService            : @local::automaticSeeds
+    }
+}
+
+physics : {
+
+    producers:  {
+
+        generate:
+        {
+            module_type          : EventGenerator
+            inputfile            : "MuCapG4/test/muCapGun.txt"
+            allowReplacement     : true
+            messageOnReplacement : true
+        }
+
+        g4run :
+        {
+            module_type          : MuCapG4
+            diagLevel            : 1
+            generatorModuleLabel : generate
+
+            geometry : {
+                forceAuxEdgeVisible : true
+                doSurfaceCheck : false
+
+                world : {
+                    // solenoid inner bore: ID=1m, L=223cm
+                    halfLength : [ 500, 500, 1200]
+                    materialName : "WAGVacuum" // FIXME: CradleGas
+                    cradleGasN2VolumeFraction : 0.03 // GCAP
+                    visible : false
+                    solid   : false
+                }
+
+                cathode : {
+                    radius : 169 // mm
+                    thickness : 0.00005872 // mm
+                    material : G4_MYLAR
+                }
+
+                pcModule : {
+                    material : G4_DIETHYL_ETHER // FIXME
+                    nwires : 160
+                    wireSpacing : 2 // mm
+                    wire : {
+                        material : G4_W
+                        diameter : 0.015 // 15 um
+                    }
+                    visible : true
+                    solid : false
+                }
+                targetModule : {
+                    material : G4_DIETHYL_ETHER // FIXME
+                    nwires : 48
+                    wireSpacing : 2 // mm
+                    wire : {
+                        material : G4_W
+                        diameter : 0.015 // 15 um
+                    }
+                    target : {
+                        radius : 169 // mm
+                        thickness : 0.071 // 71 um
+                        material : G4_Al
+                    }
+                    visible : true
+                    solid : false
+                }
+
+                // Numbers from dt_geo.00038, converted to mm
+                chamberModules : [
+                    {
+                        type  : pcModule
+                        zfoil : [ -599.9000, -595.9000, -591.9000, -587.9000, -583.9000]
+                        zwire : [ -597., -593., -589., -585.]
+                        rotation : [ +45.0, -45.0, +45.0, -45.0 ]
+                    },
+                    {
+                        type  : targetModule
+                        // Put tgt at 0 for feasibility studies
+                        //zfoil : [ -8.0000, -4.0000, 0., 4.0000, 8.0000 ]
+                        zfoil : [ -8.0000, -4.0000,  0.1524, 4.0000, 8.0000 ]
+                        zwire : [ -6, -2, 2, 6 ]
+                        rotation : [ +135.0, -135.0, +135.0, -135.0 ]
+                    },
+                    {
+                        type  : pcModule
+                        zfoil : [ 583.8932,  587.8932,  591.8932,  595.8932,  599.8932 ]
+                        zwire : [ 585.8932, 589.8932, 593.8932, 597.8932 ]
+                        rotation : [ +135.0, -135.0, +135.0, -135.0 ]
+                    }
+                ]
+            }
+
+#            visMacro             : "Mu2eG4/test/visxy.mac"
+#            visMacro             : "Mu2eG4/test/visxz.mac"
+#            visMacro             : "Mu2eG4/test/visyz.mac"
+            visMacro             : "Mu2eG4/test/vis45.mac"
+#            visMacro             : "Mu2eG4/test/visTree.mac"
+        }
+
+        randomsaver          : @local::randomsaver
+
+    }
+
+    p1 : [generate, g4run]
+    e1 : [outfile]
+
+    trigger_paths  : [p1]
+    end_paths      : [e1]
+
+}
+
+outputs:  {
+
+    outfile : {
+        module_type   :   RootOutput
+        fileName      :   "data_mucap.root"
+    }
+
+}
+
+// Initialze seeding of random engines: do not put these lines in base .fcl files for grid jobs.
+services.user.SeedService.baseSeed         :  0
+services.user.SeedService.maxUniqueEngines :  20
+
+// This tells emacs to view this file in the JavaScript mode.
+// Local Variables:
+// mode:js
+// End:

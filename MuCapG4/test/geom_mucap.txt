@@ -1,0 +1,42 @@
+string detector.name           = "twist";
+
+// Tell GeometryService to ignore the normal Mu2e stuff
+bool mu2e.standardDetector = false;
+
+vector<string> mu2e.materials = {"WAGVacuum"};
+bool           mu2e.printParticleDataTable = false;
+
+// Use a decent physics list
+string g4.physicsListName      = "QGSP_BERT_HP";
+
+bool g4.printElements          = true;
+bool g4.printMaterials         = true;
+bool g4.printPhysicsProcessSummary = true;
+
+// maximum allowed number of steps per track per event; 0 is unlimited
+int  g4.steppingActionMaxSteps = 0;
+
+// maximum global time per track per event; 0 is unlimited
+double g4.steppingActionMaxGlobalTime = 0.0;
+
+// times for time virtual detector when particle steps are recorded
+// when the time threshold is crossed in a step
+vector<double> g4.steppingActionTimeVD = {0.01};
+
+// list of volumes when tracks are kiled on entry
+vector<string> g4SteppingAction.killInTheseVolumes = {};
+
+// enable killing of low energy particles
+bool   g4.killLowEKine = false;
+
+// global kinetic energy cut (MeV)
+double g4.eKineMin     = 1000000.0;
+
+// a more selective kinetic energy cut depending on the pdg code
+vector<int>    g4.killLowEKinePDG = {};
+vector<double> g4.eKineMinPDG     = {};
+
+// This tells emacs to view this file in c++ mode.
+// Local Variables:
+// mode:c++
+// End:
