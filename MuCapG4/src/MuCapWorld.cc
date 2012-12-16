@@ -8,6 +8,7 @@
 #include <iomanip>
 #include <cmath>
 #include <vector>
+#include <utility>
 
 // Framework includes
 #include "cetlib/exception.h"
@@ -115,6 +116,17 @@ namespace mu2e {
   }
 
   //================================================================
+  //Helper for constructChamberModule()
+  namespace {
+    std::pair<const ParameterSet*, const ParameterSet*>
+    getFoilPair(unsigned iplane, const ParameterSet& cathode, const ParameterSet& centralFoil, unsigned iTargetFoil) {
+      return make_pair( (iplane==iTargetFoil)? &centralFoil : &cathode,
+                        (iplane+1==iTargetFoil)? &centralFoil : &cathode
+                        );
+    }
+  }
+
+  //----------------
   unsigned MuCapWorld::constructChamberModule(unsigned moduleNumber,
                                               unsigned planeNumberOffset,
                                               const ParameterSet& pars,
@@ -194,8 +206,13 @@ namespace mu2e {
     const vector<double> planeRotationDegrees(pars.get<vector<double> >("rotation"));
 
     for(unsigned iplane = 0; iplane < zwire.size(); ++iplane) {
-      const double driftZmin = zfoil[iplane]   + 0.5*cathode.get<double>("thickness") - zcenter;
-      const double driftZmax = zfoil[iplane+1] - 0.5*cathode.get<double>("thickness") - zcenter;
+
+      std::pair<const ParameterSet*, const ParameterSet*>
+        foils = getFoilPair(iplane, cathode, centralFoil, iTargetFoil);
+
+      const double driftZmin = zfoil[iplane]   + 0.5*foils.first->get<double>("thickness") - zcenter;
+      const double driftZmax = zfoil[iplane+1] - 0.5*foils.second->get<double>("thickness") - zcenter;
+
       constructDriftPlane(planeNumberOffset+iplane,
                           detail,
                           planeRotationDegrees[iplane] * CLHEP::degree,
