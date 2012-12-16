@@ -6,15 +6,17 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <cmath>
 #include <vector>
 
 // Framework includes
 #include "cetlib/exception.h"
 
+#include "art/Framework/Services/Registry/ServiceHandle.h"
+
 // Mu2e includes
 #include "G4Helper/inc/G4Helper.hh"
 #include "Mu2eG4/inc/constructStudyEnv_v001.hh"
-#include "Mu2eG4/inc/MaterialFinder.hh"
 #include "Mu2eG4/inc/findMaterialOrThrow.hh"
 #include "Mu2eG4/inc/nestBox.hh"
 #include "GeometryService/inc/GeometryService.hh"
@@ -65,7 +67,7 @@ namespace mu2e {
   const std::string MuCapWorld::targetModuleType_("targetModule");
 
   //================================================================
-  MuCapWorld::MuCapWorld(const fhicl::ParameterSet& geom)
+  MuCapWorld::MuCapWorld(const ParameterSet& geom)
     : geom_(geom)
     , forceAuxEdgeVisible_(geom.get<bool>("forceAuxEdgeVisible"))
     , doSurfaceCheck_(geom.get<bool>("doSurfaceCheck"))
@@ -84,7 +86,7 @@ namespace mu2e {
   // This is the callback called by G4
   G4VPhysicalVolume * MuCapWorld::construct(){
 
-    const fhicl::ParameterSet world(geom_.get<fhicl::ParameterSet>("world"));
+    const ParameterSet world(geom_.get<ParameterSet>("world"));
 
     // the canonical World volume
     VolumeInfo worldVInfo(nestBox("World",
@@ -102,7 +104,7 @@ namespace mu2e {
                                   false)); // do not surface check this one
 
     //----------------------------------------------------------------
-    vector<fhicl::ParameterSet> modulePars(geom_.get<vector<fhicl::ParameterSet> >("chamberModules"));
+    vector<ParameterSet> modulePars(geom_.get<vector<ParameterSet> >("chamberModules"));
     for(unsigned i = 0, wpoff=0; i < modulePars.size(); ++i) {
       wpoff += constructChamberModule(i, wpoff, modulePars[i], worldVInfo);
     }
@@ -115,7 +117,7 @@ namespace mu2e {
   //================================================================
   unsigned MuCapWorld::constructChamberModule(unsigned moduleNumber,
                                               unsigned planeNumberOffset,
-                                              const fhicl::ParameterSet& pars,
+                                              const ParameterSet& pars,
                                               const VolumeInfo& parent
                                               )
   {
@@ -123,10 +125,10 @@ namespace mu2e {
              <<", planeNumberOffset = "<<planeNumberOffset<<std::endl;
 
     const string moduleType(pars.get<string>("type"));
-    const fhicl::ParameterSet detail(geom_.get<fhicl::ParameterSet>(moduleType));
-    const fhicl::ParameterSet cathode(geom_.get<fhicl::ParameterSet>("cathode"));
+    const ParameterSet detail(geom_.get<ParameterSet>(moduleType));
+    const ParameterSet cathode(geom_.get<ParameterSet>("cathode"));
 
-    const fhicl::ParameterSet
+    const ParameterSet
       centralFoil( (moduleType == targetModuleType_) ?
                    detail.get<ParameterSet>("target"):
                    cathode
@@ -162,9 +164,9 @@ namespace mu2e {
                                 moduleCenterInParent,
                                 parent,
                                 0,
-                                detail.get<bool>("visible"),
+                                detail.get<bool>("moduleBoxVisible"),
                                 G4Colour::Cyan(),
-                                detail.get<bool>("solid"),
+                                detail.get<bool>("moduleBoxSolid"),
                                 forceAuxEdgeVisible_,
                                 placePV_,
                                 doSurfaceCheck_
@@ -187,18 +189,118 @@ namespace mu2e {
                     );
     }
 
+    // Create the drift cells and install wires
+    const vector<double> planeRotationDegrees(pars.get<vector<double> >("rotation"));
+
+    for(unsigned iplane = 0; iplane < zwire.size(); ++iplane) {
+      // wires may not be centered in the drift cells
+      const CLHEP::Hep3Vector wpcenterInParent(0,0, zwire[iplane] - zcenter);
+      const double driftZmin = zfoil[iplane]   + 0.5*cathode.get<double>("thickness") - zcenter;
+      const double driftZmax = zfoil[iplane+1] - 0.5*cathode.get<double>("thickness") - zcenter;
+
+      constructDriftPlane(planeNumberOffset+iplane,
+                          detail,
+                          planeRotationDegrees[iplane] * CLHEP::degree,
+                          wpcenterInParent,
+                          driftZmin,
+                          driftZmax,
+                          modInfo
+                          );
+    }
+
+
+
     return zwire.size();
   }
 
   //================================================================
   void MuCapWorld::constructFoil(unsigned imodule,
                                  unsigned ifoil,
-                                 const fhicl::ParameterSet& foilPars,
+                                 const ParameterSet& foilPars,
                                  const CLHEP::Hep3Vector& centerInParent,
                                  const VolumeInfo& parent)
   {
+    ostringstream osname("cathode_");
+    osname<<std::setw(2)<<std::setfill('0')<<imodule<<"_"<<ifoil;
+
+    TubsParams params(0./* rIn */, foilPars.get<double>("radius"), 0.5*foilPars.get<double>("thickness"));
+
+    VolumeInfo modInfo(nestTubs(osname.str(),
+                                params,
+                                findMaterialOrThrow(foilPars.get<string>("material")),
+                                0, // no rotation
+                                centerInParent,
+                                parent,
+                                0,
+                                foilPars.get<bool>("visible"),
+                                G4Colour::Gray(),
+                                foilPars.get<bool>("solid"),
+                                forceAuxEdgeVisible_,
+                                placePV_,
+                                doSurfaceCheck_
+                                ));
   }
 
   //================================================================
+  void MuCapWorld::constructDriftPlane(unsigned globalPlaneNumber,
+                                       const ParameterSet& detail,
+                                       double planeRotationAngle,
+                                       const CLHEP::Hep3Vector& wirePlaneCenterInParent,
+                                       double driftZmin,
+                                       double driftZmax,
+                                       const VolumeInfo& parent
+                                       )
+    {
+      const unsigned ncells = detail.get<unsigned>("nwires");
+      const double dx = detail.get<double>("wireSpacing");
 
+      const double chamberRadius = geom_.get<ParameterSet>("cathode").get<double>("radius");
+      const double safety = 0.5; // mm
+
+      using namespace CLHEP;
+      AntiLeakRegistry& reg = art::ServiceHandle<G4Helper>()->antiLeakRegistry();
+      CLHEP::HepRotation *rot = reg.add(new HepRotation(HepRotationZ(-planeRotationAngle)));
+
+      for(unsigned icell=0; icell<ncells; ++icell) {
+        const double xmin = dx*(icell -0.5*ncells);
+        const double xmax = xmin + dx;
+        const double yHalfSize = -safety +
+          sqrt(chamberRadius*chamberRadius - max(pow(xmin,2), pow(xmax,2)));
+
+        if(yHalfSize <= 0) {
+          throw cet::exception("GEOM")<<__func__<<" Got invalid yHalfSize = "<<yHalfSize<<"\n";
+        }
+
+        // std::cout<<"drift cell: x=["<<xmin<<", "<<xmax<<"], yHalfSize="<<yHalfSize<<std::endl;
+
+        vector<double> cellHalfSize(3);
+        cellHalfSize[0] = 0.5*dx;
+        cellHalfSize[1] = yHalfSize;
+        cellHalfSize[2] = 0.5*(driftZmax - driftZmin);
+
+       const CLHEP::Hep3Vector
+         cellCenterInParent(rot->inverse()*CLHEP::Hep3Vector(0.5*(xmax+xmin), 0, 0.5*(driftZmax + driftZmin)));
+
+        ostringstream osname("driftPlane_");
+        osname<<std::setw(2)<<std::setfill('0')<<globalPlaneNumber<<"_"<<icell;
+        VolumeInfo cellVI(nestBox(osname.str(),
+                                  cellHalfSize,
+                                  findMaterialOrThrow(detail.get<string>("material")),
+                                  rot,
+                                  cellCenterInParent,
+                                  parent,
+                                  1000*globalPlaneNumber + icell, // volume copy number
+                                  detail.get<bool>("driftCellVisible"),
+                                  G4Colour::Magenta(),
+                                  detail.get<bool>("driftCellSolid"),
+                                  forceAuxEdgeVisible_,
+                                  placePV_,
+                                  doSurfaceCheck_
+                                  )
+                          );
+
+      }
+    }
+
+  //================================================================
 } // end namespace mu2e

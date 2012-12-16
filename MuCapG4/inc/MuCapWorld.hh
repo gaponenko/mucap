@@ -32,6 +32,14 @@ namespace mu2e {
                        const CLHEP::Hep3Vector& centerInParent,
                        const VolumeInfo& parent);
 
+    void constructDriftPlane(unsigned globalPlaneNumber,
+                             const fhicl::ParameterSet& detail,
+                             double planeRotation, // radians
+                             const CLHEP::Hep3Vector& wirePlaneCenterInParent,
+                             double driftZmin, // in parent
+                             double driftZmax, // in parent
+                             const VolumeInfo& parent
+                             );
   public:
 
     explicit MuCapWorld(const fhicl::ParameterSet& pset);

@@ -61,6 +61,8 @@ physics : {
                     radius : 169 // mm
                     thickness : 0.00005872 // mm
                     material : G4_MYLAR
+                    visible : true
+                    solid : false
                 }
 
                 pcModule : {
@@ -71,8 +73,10 @@ physics : {
                         material : G4_W
                         diameter : 0.015 // 15 um
                     }
-                    visible : true
-                    solid : false
+                    moduleBoxVisible : false
+                    moduleBoxSolid : false
+                    driftCellVisible : true
+                    driftCellSolid : false
                 }
                 targetModule : {
                     material : G4_DIETHYL_ETHER // FIXME
@@ -86,9 +90,13 @@ physics : {
                         radius : 169 // mm
                         thickness : 0.071 // 71 um
                         material : G4_Al
+                        visible : true
+                        solid : true
                     }
-                    visible : true
-                    solid : false
+                    moduleBoxVisible : false
+                    moduleBoxSolid : false
+                    driftCellVisible : true
+                    driftCellSolid : false
                 }
 
                 // Numbers from dt_geo.00038, converted to mm
