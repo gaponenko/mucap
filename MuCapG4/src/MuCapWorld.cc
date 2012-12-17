@@ -92,7 +92,7 @@ namespace mu2e {
     // the canonical World volume
     VolumeInfo worldVInfo(nestBox("World",
                                   world.get<vector<double> >("halfLength"),
-                                  findMaterialOrThrow(world.get<string>("materialName")),
+                                  findMaterialOrThrow(world.get<string>("material")),
                                   0,
                                   G4ThreeVector(),
                                   0, // no parent

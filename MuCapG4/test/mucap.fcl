@@ -52,7 +52,7 @@ physics : {
                 world : {
                     // solenoid inner bore: ID=1m, L=223cm
                     halfLength : [ 500, 500, 1200]
-                    materialName : "MUCAP_CRADLE_GAS"
+                    material : "MUCAP_CRADLE_GAS"
                     visible : false
                     solid   : false
                 }
