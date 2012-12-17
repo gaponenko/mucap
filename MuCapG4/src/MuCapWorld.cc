@@ -2,7 +2,6 @@
 
 #include "MuCapG4/inc/MuCapWorld.hh"
 
-// C++ includes
 #include <iostream>
 #include <sstream>
 #include <iomanip>
@@ -10,25 +9,12 @@
 #include <vector>
 #include <utility>
 
-// Framework includes
 #include "cetlib/exception.h"
+
+#include "CLHEP/Units/SystemOfUnits.h"
 
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 
-// Mu2e includes
-#include "G4Helper/inc/G4Helper.hh"
-#include "Mu2eG4/inc/constructStudyEnv_v001.hh"
-#include "Mu2eG4/inc/findMaterialOrThrow.hh"
-#include "Mu2eG4/inc/nestBox.hh"
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
-#include "GeometryService/inc/WorldG4.hh"
-#include "BFieldGeom/inc/BFieldConfig.hh"
-#include "BFieldGeom/inc/BFieldManager.hh"
-#include "Mu2eG4/inc/nestTubs.hh"
-#include "GeomPrimitives/inc/TubsParams.hh"
-
-// G4 includes
 #include "G4GeometryManager.hh"
 #include "G4PhysicalVolumeStore.hh"
 #include "G4LogicalVolumeStore.hh"
@@ -37,7 +23,6 @@
 #include "G4Colour.hh"
 #include "G4Tubs.hh"
 #include "G4ThreeVector.hh"
-#include "globals.hh"
 #include "G4UniformMagField.hh"
 #include "G4FieldManager.hh"
 #include "G4Mag_UsualEqRhs.hh"
@@ -52,9 +37,20 @@
 #include "G4HelixImplicitEuler.hh"
 #include "G4HelixSimpleRunge.hh"
 #include "G4GDMLParser.hh"
+#include "G4UserLimits.hh"
 
-#include "Mu2eG4/inc/Mu2eGlobalField.hh"
-#include "Mu2eG4/inc/FieldMgr.hh"
+// Mu2e includes
+#include "G4Helper/inc/G4Helper.hh"
+#include "Mu2eG4/inc/constructStudyEnv_v001.hh"
+#include "Mu2eG4/inc/findMaterialOrThrow.hh"
+#include "Mu2eG4/inc/nestBox.hh"
+#include "GeometryService/inc/GeometryService.hh"
+#include "GeometryService/inc/GeomHandle.hh"
+#include "GeometryService/inc/WorldG4.hh"
+#include "BFieldGeom/inc/BFieldConfig.hh"
+#include "BFieldGeom/inc/BFieldManager.hh"
+#include "Mu2eG4/inc/nestTubs.hh"
+#include "GeomPrimitives/inc/TubsParams.hh"
 
 #define AGDEBUG(stuff) do { std::cerr<<"AG: "<<__FILE__<<", line "<<__LINE__<<", func "<<__func__<<": "<<stuff<<std::endl; } while(0)
 //#define AGDEBUG(stuff)
@@ -103,6 +99,41 @@ namespace mu2e {
                                   forceAuxEdgeVisible_,
                                   placePV_,
                                   false)); // do not surface check this one
+
+
+    //----------------------------------------------------------------
+    // Define the magnetic field
+
+    AntiLeakRegistry& reg = art::ServiceHandle<G4Helper>()->antiLeakRegistry();
+    const CLHEP::Hep3Vector fieldVector(0, 0, world.get<double>("BFieldInTesla")*CLHEP::tesla);
+    G4MagneticField *field = reg.add(new G4UniformMagField(fieldVector));
+    G4Mag_UsualEqRhs *rhs  = reg.add(new G4Mag_UsualEqRhs(field));
+
+    G4MagIntegratorStepper *integrator = reg.add(new G4ExactHelixStepper(rhs));
+    //G4MagIntegratorStepper *integrator = reg.add(new G4NystromRK4(rhs));
+
+    const double stepMinimum = world.get<double>("BFstepMinimum", 1.0e-2 * CLHEP::mm /*The default from G4ChordFinder.hh*/);
+    G4ChordFinder          *chordFinder = reg.add(new G4ChordFinder(field, stepMinimum, integrator));
+
+    const double deltaOld = chordFinder->GetDeltaChord();
+    chordFinder->SetDeltaChord(world.get<double>("BFdeltaChord", deltaOld));
+
+    G4FieldManager *manager = reg.add(new G4FieldManager(field, chordFinder));
+
+//    manager->SetMinimumEpsilonStep(config.getDouble("extMonFNAL."+volNameSuffix+".magnet.minEpsilonStep", manager->GetMinimumEpsilonStep()));
+//    manager->SetMaximumEpsilonStep(config.getDouble("extMonFNAL."+volNameSuffix+".magnet.maxEpsilonStep", manager->GetMaximumEpsilonStep()));
+//    manager->SetDeltaOneStep(config.getDouble("extMonFNAL."+volNameSuffix+".magnet.deltaOneStep", manager->GetDeltaOneStep()));
+
+    worldVInfo.logical->SetFieldManager(manager, true);
+
+    //----------------------------------------------------------------
+    // Step limit
+    const double maxStepLength = world.get<double>("maxG4StepLength", 0)*CLHEP::millimeter;
+    if(maxStepLength > 0) {
+      std::cout<<"Adding step limiter: maxStepLength = "<<maxStepLength<<std::endl;
+      G4UserLimits* emfcStepLimit = reg.add(G4UserLimits(maxStepLength));
+      worldVInfo.logical->SetUserLimits(emfcStepLimit);
+    }
 
     //----------------------------------------------------------------
     vector<ParameterSet> modulePars(geom_.get<vector<ParameterSet> >("chamberModules"));

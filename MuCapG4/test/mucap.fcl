@@ -53,6 +53,8 @@ physics : {
                     // solenoid inner bore: ID=1m, L=223cm
                     halfLength : [ 500, 500, 1200]
                     material : "MUCAP_CRADLE_GAS"
+                    BFieldInTesla : 2.0
+                    maxG4StepLength : 1 // mm, for visualization
                     visible : false
                     solid   : false
                 }
@@ -134,7 +136,7 @@ physics : {
                 printMaterials : true
             }
 
-//            visMacro             : "MuCapG4/test/vis_mucap.mac"
+            visMacro             : "MuCapG4/test/vis_mucap.mac"
         }
 
         randomsaver          : @local::randomsaver
