@@ -20,6 +20,7 @@
 
 
 #include "MuCapG4/inc/MuCapWorld.hh"
+#include "MuCapG4/inc/MuCapMaterials.hh"
 
 // Mu2e includes
 #include "MCDataProducts/inc/GenParticleCollection.hh"
@@ -106,6 +107,7 @@ namespace mu2e {
     auto_ptr<Mu2eG4RunManager> _runManager;
 
     fhicl::ParameterSet _geomPars;
+    fhicl::ParameterSet _materialPars;
 
     // Do we issue warnings about multiple runs?
     bool _warnEveryNewRun;
@@ -157,6 +159,7 @@ namespace mu2e {
   MuCapG4::MuCapG4(fhicl::ParameterSet const& pset):
     _runManager(0),
     _geomPars(pset.get<fhicl::ParameterSet>("geometry")),
+    _materialPars(pset.get<fhicl::ParameterSet>("materials")),
     _warnEveryNewRun(pset.get<bool>("warnEveryNewRun",false)),
     _exportPDTStart(pset.get<bool>("exportPDTStart",false)),
     _exportPDTEnd(pset.get<bool>("exportPDTEnd",false)),
@@ -277,11 +280,14 @@ namespace mu2e {
 
     // Create user actions and register them with G4.
 
-    WorldMaker<MuCapWorld>* allMu2e    = new WorldMaker<MuCapWorld>(std::auto_ptr<MuCapWorld>(new MuCapWorld(_geomPars)));
+
 
     _runManager->SetVerboseLevel(_rmvlevel);
 
-    _runManager->SetUserInitialization(allMu2e);
+    _runManager->SetUserInitialization(new WorldMaker<MuCapWorld, MuCapMaterials>
+                                       (std::auto_ptr<MuCapWorld>(new MuCapWorld(_geomPars)),
+                                        std::auto_ptr<MuCapMaterials>(new MuCapMaterials(_materialPars)))
+                                       );
 
     G4VUserPhysicsList* pL = physicsListDecider(config);
     pL->SetVerboseLevel(_rmvlevel);

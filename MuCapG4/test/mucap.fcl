@@ -52,8 +52,7 @@ physics : {
                 world : {
                     // solenoid inner bore: ID=1m, L=223cm
                     halfLength : [ 500, 500, 1200]
-                    materialName : "WAGVacuum" // FIXME: CradleGas
-                    cradleGasN2VolumeFraction : 0.03 // GCAP
+                    materialName : "MUCAP_CRADLE_GAS"
                     visible : false
                     solid   : false
                 }
@@ -61,17 +60,17 @@ physics : {
                 cathode : {
                     radius : 169 // mm
                     thickness : 0.005872 // mm
-                    material : G4_MYLAR
+                    material : "G4_MYLAR"
                     visible : false
                     solid : false
                 }
 
                 pcModule : {
-                    material : G4_DIETHYL_ETHER // FIXME
+                    material : "MUCAP_PC_GAS"
                     nwires : 160
                     wireSpacing : 2 // mm
                     wire : {
-                        material : G4_W
+                        material : "G4_W"
                         diameter : 0.015 // 15 um
                         visible : false
                         solid : true
@@ -82,11 +81,11 @@ physics : {
                     driftCellSolid : false
                 }
                 targetModule : {
-                    material : G4_DIETHYL_ETHER // FIXME
+                    material : "MUCAP_PC_GAS"
                     nwires : 48
                     wireSpacing : 2 // mm
                     wire : {
-                        material : G4_W
+                        material : "G4_W"
                         diameter : 0.015 // 15 um
                         visible : false
                         solid : true
@@ -94,7 +93,7 @@ physics : {
                     target : {
                         radius : 169 // mm
                         thickness : 0.071 // 71 um
-                        material : G4_Al
+                        material : "G4_Al"
                         visible : true
                         solid : true
                     }
@@ -125,7 +124,16 @@ physics : {
                         rotation : [ +135.0, -135.0, +135.0, -135.0 ]
                     }
                 ]
+            } // end of geometry
+
+            materials : {
+                TCelsius : 20
+                pcGasCF4MassFraction : 0.8
+                cradleGasN2VolumeFraction : 0.03
+                printElements : true
+                printMaterials : true
             }
+
 //            visMacro             : "MuCapG4/test/vis_mucap.mac"
         }
 
