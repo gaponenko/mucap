@@ -1,0 +1,107 @@
+// fhicl include file that defines detector geometry
+//
+// Andrei Gaponenko, 2012
+
+BEGIN_PROLOG
+
+//================================================================
+mucapMaterials : {
+    TCelsius : 20
+    pcGasCF4MassFraction : 0.8
+    cradleGasN2VolumeFraction : 0.03
+    printElements : true
+    printMaterials : true
+}
+
+//================================================================
+mucapGeometry : {
+    forceAuxEdgeVisible : true
+    doSurfaceCheck : false
+
+    world : {
+        // solenoid inner bore: ID=1m, L=223cm
+        halfLength : [ 500, 500, 1200]
+        material : "MUCAP_CRADLE_GAS"
+        BFieldInTesla : 2.0
+        maxG4StepLength : 1 // mm, for visualization
+        visible : false
+        solid   : false
+    }
+
+    cathode : {
+        radius : 169 // mm
+        thickness : 0.005872 // mm
+        material : "G4_MYLAR"
+        visible : false
+        solid : false
+    }
+
+    pcModule : {
+        material : "MUCAP_PC_GAS"
+        nwires : 160
+        wireSpacing : 2 // mm
+        wire : {
+            material : "G4_W"
+            diameter : 0.015 // 15 um
+            visible : false
+            solid : true
+        }
+        moduleBoxVisible : false
+        moduleBoxSolid : false
+        driftCellVisible : true
+        driftCellSolid : false
+    }
+    targetModule : {
+        material : "MUCAP_PC_GAS"
+        nwires : 48
+        wireSpacing : 2 // mm
+        wire : {
+            material : "G4_W"
+            diameter : 0.015 // 15 um
+            visible : false
+            solid : true
+        }
+        target : {
+            radius : 169 // mm
+            thickness : 0.071 // 71 um
+            material : "G4_Al"
+            visible : true
+            solid : true
+        }
+        moduleBoxVisible : false
+        moduleBoxSolid : false
+        driftCellVisible : true
+        driftCellSolid : false
+    }
+
+    // Ideal geometry
+    chamberModules : [
+        {
+            type  : pcModule
+            zfoil : [ -600, -596, -592, -588, -584]
+            zwire : [    -598, -594, -590, -586]
+            rotation : [ +45.0, -45.0, +45.0, -45.0 ]
+        },
+        {
+            type  : targetModule
+            zfoil : [ -8, -4, 0, 4, 8 ]
+            zwire : [   -6, -2, 2, 6 ]
+            rotation : [ +135.0, -135.0, +135.0, -135.0 ]
+        },
+        {
+            type  : pcModule
+            zfoil : [ 584,  588,  592,  596, 600 ]
+            zwire : [    586,  590,  594, 598 ]
+            rotation : [ +135.0, -135.0, +135.0, -135.0 ]
+        }
+    ]
+} // end of geometry
+
+//================================================================
+
+END_PROLOG
+
+// This tells emacs to view this file in the JavaScript mode.
+// Local Variables:
+// mode:js
+// End:
