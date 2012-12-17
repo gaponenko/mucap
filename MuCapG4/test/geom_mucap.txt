@@ -18,10 +18,11 @@ int  g4.steppingActionMaxSteps = 0;
 
 // maximum global time per track per event; 0 is unlimited
 double g4.steppingActionMaxGlobalTime = 0.0;
+bool g4.steppingActionSaveSteps = false;
 
 // times for time virtual detector when particle steps are recorded
 // when the time threshold is crossed in a step
-vector<double> g4.steppingActionTimeVD = {0.01};
+//vector<double> g4.steppingActionTimeVD = {0.01};
 
 // list of volumes when tracks are kiled on entry
 vector<string> g4SteppingAction.killInTheseVolumes = {};

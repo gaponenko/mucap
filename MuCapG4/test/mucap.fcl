@@ -41,7 +41,8 @@ physics : {
         g4run :
         {
             module_type          : MuCapG4
-            diagLevel            : 1
+            diagLevel            : 2
+            trackingVerbosityLevel : 2
             generatorModuleLabel : generate
 
             geometry : {
@@ -59,7 +60,7 @@ physics : {
 
                 cathode : {
                     radius : 169 // mm
-                    thickness : 0.00005872 // mm
+                    thickness : 0.005872 // mm
                     material : G4_MYLAR
                     visible : false
                     solid : false
@@ -103,32 +104,29 @@ physics : {
                     driftCellSolid : false
                 }
 
-                // Numbers from dt_geo.00038, converted to mm
+                // Ideal geometry
                 chamberModules : [
                     {
                         type  : pcModule
-                        zfoil : [ -599.9000, -595.9000, -591.9000, -587.9000, -583.9000]
-                        zwire : [ -597., -593., -589., -585.]
+                        zfoil : [ -600, -596, -592, -588, -584]
+                        zwire : [    -598, -594, -590, -586]
                         rotation : [ +45.0, -45.0, +45.0, -45.0 ]
                     },
                     {
                         type  : targetModule
-                        // Put tgt at 0 for feasibility studies
-                        //zfoil : [ -8.0000, -4.0000, 0., 4.0000, 8.0000 ]
-                        zfoil : [ -8.0000, -4.0000,  0.1524, 4.0000, 8.0000 ]
-                        zwire : [ -6, -2, 2, 6 ]
+                        zfoil : [ -8, -4, 0, 4, 8 ]
+                        zwire : [   -6, -2, 2, 6 ]
                         rotation : [ +135.0, -135.0, +135.0, -135.0 ]
                     },
                     {
                         type  : pcModule
-                        zfoil : [ 583.8932,  587.8932,  591.8932,  595.8932,  599.8932 ]
-                        zwire : [ 585.8932, 589.8932, 593.8932, 597.8932 ]
+                        zfoil : [ 584,  588,  592,  596, 600 ]
+                        zwire : [    586,  590,  594, 598 ]
                         rotation : [ +135.0, -135.0, +135.0, -135.0 ]
                     }
                 ]
             }
-
-            visMacro             : "MuCapG4/test/vis_mucap.mac"
+//            visMacro             : "MuCapG4/test/vis_mucap.mac"
         }
 
         randomsaver          : @local::randomsaver
