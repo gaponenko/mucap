@@ -1,0 +1,26 @@
+/control/verbose 0
+/run/verbose 0
+
+/vis/disable
+/vis/open OGLIX 1600x800-0+0
+/vis/viewer/set/background white ! ! 0.01
+
+/vis/viewer/set/projection orthogonal
+
+# absolute pan
+/vis/viewer/panTo 0.0 0.0
+# absolute zoom:
+/vis/viewer/zoomTo 2.0
+/vis/scene/create
+/vis/scene/add/volume World
+/vis/scene/add/trajectories
+/vis/sceneHandler/attach
+/vis/scene/endOfEventAction refresh
+
+################################################################
+/vis/viewer/set/viewpointThetaPhi 90 45
+
+################################################################
+/vis/enable 
+
+# Do NOT issue the /run/beamon command

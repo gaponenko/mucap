@@ -14,7 +14,7 @@ source : {
 services : {
 
     message               : @local::default_message
-    TFileService          : { fileName : "mucap.root" }
+    TFileService          : { fileName : "hist_mucap.root" }
     RandomNumberGenerator : { }
 
     user : {
@@ -72,12 +72,12 @@ physics : {
                     wire : {
                         material : G4_W
                         diameter : 0.015 // 15 um
-                        visible : true
+                        visible : false
                         solid : true
                     }
                     moduleBoxVisible : false
                     moduleBoxSolid : false
-                    driftCellVisible : false
+                    driftCellVisible : true
                     driftCellSolid : false
                 }
                 targetModule : {
@@ -87,7 +87,7 @@ physics : {
                     wire : {
                         material : G4_W
                         diameter : 0.015 // 15 um
-                        visible : true
+                        visible : false
                         solid : true
                     }
                     target : {
@@ -128,11 +128,7 @@ physics : {
                 ]
             }
 
-#            visMacro             : "Mu2eG4/test/visxy.mac"
-#            visMacro             : "Mu2eG4/test/visxz.mac"
-#            visMacro             : "Mu2eG4/test/visyz.mac"
-            visMacro             : "Mu2eG4/test/vis45.mac"
-#            visMacro             : "Mu2eG4/test/visTree.mac"
+            visMacro             : "MuCapG4/test/vis_mucap.mac"
         }
 
         randomsaver          : @local::randomsaver
