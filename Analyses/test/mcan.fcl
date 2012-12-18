@@ -17,14 +17,19 @@ services : {
 
 physics : {
     analyzers : {
-        mcan : {
+        mcparticles : {
+            module_type : MuCapSimParticleHist
+            inputModuleLabel : "g4run"
+            inputInstanceName : ""
+        }
+        mchits : {
             module_type : MuCapSimHitsHist
             inputModuleLabel : "g4run"
             inputInstanceName : "MuCapSimHits"
         }
     }
 
-    diagnostic: [mcan]
+    diagnostic: [mcparticles, mchits]
     end_paths : [diagnostic]
 }
 
