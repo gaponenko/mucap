@@ -9,8 +9,8 @@ mucapMaterials : {
     TCelsius : 20
     pcGasCF4MassFraction : 0.8
     cradleGasN2VolumeFraction : 0.03
-    printElements : true
-    printMaterials : true
+    printElements : false
+    printMaterials : false
 }
 
 //================================================================

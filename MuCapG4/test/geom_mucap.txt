@@ -8,9 +8,6 @@ bool           mu2e.printParticleDataTable = false;
 
 // Use a decent physics list
 string g4.physicsListName      = "QGSP_BERT_HP";
-
-bool g4.printElements          = true;
-bool g4.printMaterials         = true;
 bool g4.printPhysicsProcessSummary = true;
 
 // maximum allowed number of steps per track per event; 0 is unlimited

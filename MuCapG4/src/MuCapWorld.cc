@@ -55,7 +55,7 @@
 
 #include "MuCapG4/inc/MuCapSD.hh"
 
-#define AGDEBUG(stuff) do { std::cerr<<"AG: "<<__FILE__<<", line "<<__LINE__<<", func "<<__func__<<": "<<stuff<<std::endl; } while(0)
+//#define AGDEBUG(stuff) do { std::cerr<<"AG: "<<__FILE__<<", line "<<__LINE__<<", func "<<__func__<<": "<<stuff<<std::endl; } while(0)
 //#define AGDEBUG(stuff)
 
 
@@ -139,7 +139,7 @@ namespace mu2e {
     // Step limit
     const double maxStepLength = world.get<double>("maxG4StepLength", 0)*CLHEP::millimeter;
     if(maxStepLength > 0) {
-      std::cout<<"Adding step limiter: maxStepLength = "<<maxStepLength<<std::endl;
+      std::cout<<"MuCapWorld: Adding step limiter: maxStepLength = "<<maxStepLength<<std::endl;
       G4UserLimits* emfcStepLimit = reg.add(G4UserLimits(maxStepLength));
       worldVInfo.logical->SetUserLimits(emfcStepLimit);
     }
@@ -173,9 +173,6 @@ namespace mu2e {
                                               const VolumeInfo& parent
                                               )
   {
-    std::cout<<"MuCapWorld: constructing module "<<moduleNumber
-             <<", planeNumberOffset = "<<planeNumberOffset<<std::endl;
-
     const string moduleType(pars.get<string>("type"));
     const ParameterSet detail(geom_.get<ParameterSet>(moduleType));
     const ParameterSet cathode(geom_.get<ParameterSet>("cathode"));
