@@ -9,9 +9,7 @@ namespace mu2e {
 
 
   std::ostream& operator<<(std::ostream& os, const WireCellId& id) {
-    return os<<"WireCellId("<<id.plane().number()
-             <<","<<id.cell()
-             <<" )";
+    return os<<"WireCellId( "<<id.plane().number()<<", "<<id.cell()<<" )";
   }
 
   namespace { int MAGIC_FACTOR = 1000; } // less than 1000 wires in any plane
@@ -20,7 +18,7 @@ namespace mu2e {
     return MAGIC_FACTOR * plane_.number() + cell_;
   }
 
-  WireCellId decodeFromInteger(unsigned encodedVolumeId) {
+  WireCellId WireCellId::decodeFromInteger(unsigned encodedVolumeId) {
     unsigned cell = encodedVolumeId % MAGIC_FACTOR;
     unsigned plane = encodedVolumeId / MAGIC_FACTOR;
     return WireCellId(WirePlaneId(plane), cell);
