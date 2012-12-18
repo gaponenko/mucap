@@ -2,8 +2,8 @@
 bool particleGun.do = true;
 
 // Limits on cos(polar angle):
-double particleGun.czmin =  0.99;
-double particleGun.czmax =  0.99;
+double particleGun.czmin =  -1.;
+double particleGun.czmax =  +1;
 
 // Limits on phi angle: default [0, 2pi]
 //double particleGun.phimin = 0.0;
@@ -21,8 +21,8 @@ string particleGun.sourceShape = "cylinder_z";
 vector<double> particleGun.halfLength = { 3., 3., 0.0305 }; // 6mm and half of 71 um
 
 // Limits on momentum: (MeV)
-double particleGun.pmin = 99.;
-double particleGun.pmax = 99.;
+double particleGun.pmin = 96.99; // 5MeV=96.99MeV/c
+double particleGun.pmax = 96.99;
 
 int particleGun.id = 2212;
 
@@ -32,7 +32,7 @@ double particleGun.mean =  -1;
 // Control of histograms.
 bool particleGun.doHistograms = true;
 
-bool particleGun.verbose = true;
+bool particleGun.verbose = false;
 
 // This tells emacs to view this file in c++ mode.
 // Local Variables:

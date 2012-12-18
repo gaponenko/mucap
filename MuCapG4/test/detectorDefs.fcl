@@ -28,6 +28,10 @@ mucapGeometry : {
         solid   : false
     }
 
+    cellSD : {
+        hitsSizeLimit : 0 // zero for unlimited
+    }
+
     cathode : {
         radius : 169 // mm
         thickness : 0.005872 // mm

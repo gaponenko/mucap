@@ -38,6 +38,7 @@
 #include "G4HelixSimpleRunge.hh"
 #include "G4GDMLParser.hh"
 #include "G4UserLimits.hh"
+#include "G4SDManager.hh"
 
 // Mu2e includes
 #include "G4Helper/inc/G4Helper.hh"
@@ -51,6 +52,8 @@
 #include "BFieldGeom/inc/BFieldManager.hh"
 #include "Mu2eG4/inc/nestTubs.hh"
 #include "GeomPrimitives/inc/TubsParams.hh"
+
+#include "MuCapG4/inc/MuCapSD.hh"
 
 #define AGDEBUG(stuff) do { std::cerr<<"AG: "<<__FILE__<<", line "<<__LINE__<<", func "<<__func__<<": "<<stuff<<std::endl; } while(0)
 //#define AGDEBUG(stuff)
@@ -85,6 +88,12 @@ namespace mu2e {
 
     const ParameterSet world(geom_.get<ParameterSet>("world"));
 
+    //----------------------------------------------------------------
+    // instantiateSensitiveDetectors
+    G4SDManager* SDman      = G4SDManager::GetSDMpointer();
+    SDman->AddNewDetector(new MuCapSD(geom_.get<ParameterSet>("cellSD")));
+
+    //----------------------------------------------------------------
     // the canonical World volume
     VolumeInfo worldVInfo(nestBox("World",
                                   world.get<vector<double> >("halfLength"),
@@ -308,6 +317,9 @@ namespace mu2e {
       CLHEP::HepRotation *rot = reg.add(new HepRotation(HepRotationZ(-planeRotationAngle)));
       CLHEP::HepRotation *wireInCellRotation = reg.add(new HepRotation(HepRotationX(90*CLHEP::degree)));
 
+      G4VSensitiveDetector* cellSD = G4SDManager::GetSDMpointer()->
+        FindSensitiveDetector(MuCapSD::name());
+
       for(unsigned icell=0; icell<ncells; ++icell) {
         const double xmin = dx*(icell -0.5*ncells);
         const double xmax = xmin + dx;
@@ -346,8 +358,7 @@ namespace mu2e {
                                   )
                           );
 
-        // FIXME
-        //cellVI.centerInWorld = cellCenterInParent + parent.centerInWorld;
+        cellVI.logical->SetSensitiveDetector(cellSD);
 
         // Install the wire
         const ParameterSet wire(detail.get<ParameterSet>("wire"));

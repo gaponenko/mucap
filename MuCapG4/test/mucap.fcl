@@ -41,15 +41,16 @@ physics : {
 
         g4run: {
             module_type          : MuCapG4
-            diagLevel            : 2
-            trackingVerbosityLevel : 2
+            //diagLevel            : 2
+            //trackingVerbosityLevel : 2
+            //simHitsSizeLimit : 0
 
             generatorModuleLabel : generate
 
             geometry: @local::mucapGeometry
             materials: @local::mucapMaterials
 
-            visMacro             : "MuCapG4/test/vis_mucap.mac"
+//            visMacro             : "MuCapG4/test/vis_mucap.mac"
         }
 
         randomsaver          : @local::randomsaver

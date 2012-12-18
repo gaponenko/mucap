@@ -21,6 +21,7 @@
 
 #include "MuCapG4/inc/MuCapWorld.hh"
 #include "MuCapG4/inc/MuCapMaterials.hh"
+#include "MuCapG4/inc/MuCapSD.hh"
 
 // Mu2e includes
 #include "MCDataProducts/inc/GenParticleCollection.hh"
@@ -140,6 +141,7 @@ namespace mu2e {
     bool _printPhysicsProcessSummary;
 
     SensitiveDetectorHelper _sensitiveDetectorHelper;
+    MuCapSD *_muCapSD;
 
     // Instance name of the timeVD StepPointMC data product.
     const StepInstanceName _tvdOutputName;
@@ -178,6 +180,7 @@ namespace mu2e {
     _processInfo(),
     _printPhysicsProcessSummary(false),
     _sensitiveDetectorHelper(pset),
+    _muCapSD(),
     _tvdOutputName(StepInstanceName::timeVD),
     _steppingPointsOutputName(StepInstanceName::stepper)
   {
@@ -196,6 +199,8 @@ namespace mu2e {
 
     // so is the stepper one
     produces<StepPointMCCollection>(_steppingPointsOutputName.name());
+
+    produces<StepPointMCCollection>(MuCapSD::name());
 
     //    produces<PointTrajectoryCollection>(); // may need to revisit
     produces<PhysicalVolumeInfoCollection,art::InRun>();
@@ -279,9 +284,6 @@ namespace mu2e {
     }
 
     // Create user actions and register them with G4.
-
-
-
     _runManager->SetVerboseLevel(_rmvlevel);
 
     _runManager->SetUserInitialization(new WorldMaker<MuCapWorld, MuCapMaterials>
@@ -315,6 +317,8 @@ namespace mu2e {
 
     // Initialize G4 for this run.
     _runManager->Initialize();
+
+    _muCapSD = dynamic_cast<MuCapSD*>(G4SDManager::GetSDMpointer()->FindSensitiveDetector(MuCapSD::name()));
 
     // At this point G4 geometry and physics processes have been initialized.
     // So it is safe to modify physics processes and to compute information
@@ -362,6 +366,8 @@ namespace mu2e {
 
     //    auto_ptr<PointTrajectoryCollection> pointTrajectories( new PointTrajectoryCollection);
 
+    auto_ptr<StepPointMCCollection> muCapChamberHits(new StepPointMCCollection);
+
     // ProductID for the SimParticleCollection.
     art::ProductID simPartId(getProductID<SimParticleCollection>(event));
 
@@ -372,6 +378,8 @@ namespace mu2e {
     _genAction->setEvent(event);
 
     _steppingAction->BeginOfEvent(*tvdHits, *steppingPoints, simPartId, event );
+
+    _muCapSD->beforeG4Event(muCapChamberHits.get(), &_processInfo, simPartId, event);
 
     // Run G4 for this event and access the completed event.
     _runManager->BeamOnDoOneEvent( event.id().event() );
@@ -385,6 +393,7 @@ namespace mu2e {
     event.put(simParticles);
     event.put(tvdHits, _tvdOutputName.name());
     event.put(steppingPoints, _steppingPointsOutputName.name());
+    event.put(muCapChamberHits, MuCapSD::name());
 
     //  event.put(pointTrajectories);
 
