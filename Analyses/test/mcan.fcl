@@ -1,0 +1,34 @@
+// Andrei Gaponenko, 2012
+
+#include "minimalMessageService.fcl"
+#include "standardProducers.fcl"
+#include "standardServices.fcl"
+
+// Give this job a name.
+process_name : test
+
+source : { module_type : RootInput }
+
+services : {
+    message : @local::default_message
+    scheduler: { defaultExceptions : false }
+    TFileService : { fileName : "mcanalysis.root" }
+}
+
+physics : {
+    analyzers : {
+        mcan : {
+            module_type : MuCapSimHitsHist
+            inputModuleLabel : "g4run"
+            inputInstanceName : "MuCapSimHits"
+        }
+    }
+
+    diagnostic: [mcan]
+    end_paths : [diagnostic]
+}
+
+// This tells emacs to view this file in the JavaScript mode.
+// Local Variables:
+// mode:js
+// End:
