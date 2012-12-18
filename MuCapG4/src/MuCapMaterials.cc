@@ -35,6 +35,15 @@ namespace mu2e {
     cf4->AddElement(getElementOrThrow("F"), natoms=4);
 
     //----------------------------------------------------------------
+    const double dme_density_at_15C = 1.97 * g/cm3;
+    G4Material *dme =
+      new G4Material("MUCAP_DME", dme_density_at_15C * gasDensityFactorFrom15C, ncomp=3);
+
+    dme->AddElement(getElementOrThrow("O"), natoms=1);
+    dme->AddElement(getElementOrThrow("C"), natoms=2);
+    dme->AddElement(getElementOrThrow("H"), natoms=6);
+
+    //----------------------------------------------------------------
     const double isobutane_density_at_15C = 2.51 * g/cm3;
     G4Material *isobutane =
       new G4Material("MUCAP_ISOBUTANE", isobutane_density_at_15C * gasDensityFactorFrom15C, ncomp=2);

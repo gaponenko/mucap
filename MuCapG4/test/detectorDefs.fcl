@@ -73,6 +73,21 @@ mucapGeometry : {
         driftCellVisible : true
         driftCellSolid : false
     }
+    dcModule : {
+        material : "MUCAP_DME"
+        nwires : 80
+        wireSpacing : 4 // mm
+        wire : {
+            material : "G4_W"
+            diameter : 0.015 // 15 um
+            visible : false
+            solid : true
+        }
+        moduleBoxVisible : false
+        moduleBoxSolid : false
+        driftCellVisible : true
+        driftCellSolid : false
+    }
 
     // Ideal geometry
     chamberModules : [
@@ -83,10 +98,106 @@ mucapGeometry : {
             rotation : [ +45.0, -45.0, +45.0, -45.0 ]
         },
         {
+            type  : dcModule // dense stack
+            zfoil : [ -500, -496, -492, -488, -484, -480, -476, -472, -468 ]
+            zwire : [    -498,  -494, -490, -486, -482, -478, -474, -470 ]
+            rotation : [  -45,    45,   -45,  45,  45,   -45,  45,   -45 ]
+        },
+        {
+            type  : dcModule
+            zfoil : [ -424, -420, -416 ]
+            zwire : [   -422, -418 ]
+            rotation : [ +45,  -45 ]
+        },
+        {
+            type  : dcModule
+            zfoil : [  -352, -348, -344 ]
+            zwire : [    -350, -346 ]
+            rotation : [ +45,  -45 ]
+        },
+        {
+            type  : dcModule
+            zfoil : [ -300, -296, -292 ]
+            zwire : [   -298, -294]
+            rotation : [ +45,  -45 ]
+        },
+        {
+            type  : dcModule
+            zfoil : [ -228, -224, -220 ]
+            zwire : [   -226, -222  ]
+            rotation : [ +45,  -45 ]
+        },
+        {
+            type  : dcModule
+            zfoil : [ -176, -172, -168 ]
+            zwire : [   -174, -170 ]
+            rotation : [ +45,  -45 ]
+        },
+        {
+            type  : dcModule
+            zfoil : [ -104,  -100,  -96 ]
+            zwire : [   -102, -98 ]
+            rotation : [ +45,  -45 ]
+        },
+        {
+            type  : dcModule
+            zfoil : [ -52, -48, -44 ]
+            zwire : [   -50, -46 ]
+            rotation : [ +45,  -45 ]
+        },
+        {
             type  : targetModule
             zfoil : [ -8, -4, 0, 4, 8 ]
             zwire : [   -6, -2, 2, 6 ]
             rotation : [ +135.0, -135.0, +135.0, -135.0 ]
+        },
+        {
+            type  : dcModule
+            zfoil : [ 44, 48, 52 ]
+            zwire : [   46, 50 ]
+            rotation : [ 135, -135 ]
+        },
+        {
+            type  : dcModule
+            zfoil : [ 96, 100, 104 ]
+            zwire : [    98, 102 ]
+            rotation : [ 135, -135 ]
+        },
+        {
+            type  : dcModule
+            zfoil : [ 168, 172, 176 ]
+            zwire : [   170, 174 ]
+            rotation : [135, -135 ]
+        },
+        {
+            type  : dcModule
+            zfoil : [220, 224, 228]
+            zwire : [ 222, 226 ]
+            rotation : [ 135, -135 ]
+        },
+        {
+            type  : dcModule
+            zfoil : [292, 296, 300 ]
+            zwire : [  294, 298]
+            rotation : [135, -135]
+        },
+        {
+            type  : dcModule
+            zfoil : [ 344, 348, 352]
+            zwire : [   346, 350]
+            rotation : [135, -135]
+        },
+        {
+            type  : dcModule
+            zfoil : [ 416, 420, 424 ]
+            zwire : [   418, 422]
+            rotation : [135, -135]
+        },
+        {
+            type  : dcModule
+            zfoil : [ 468, 472, 476, 480, 484, 488, 492, 496, 500 ]
+            zwire : [   470, 474, 478, 482, 485, 490, 494, 498]
+            rotation : [135, -135, 135, -135, -135, 135, -135, 135]
         },
         {
             type  : pcModule
