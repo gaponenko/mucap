@@ -24,7 +24,7 @@ vector<double> particleGun.halfLength = { 3., 3., 0.0305 }; // 6mm and half of 7
 double particleGun.pmin = 99.;
 double particleGun.pmax = 99.;
 
-int particleGun.id = -13; //2212;
+int particleGun.id = 2212;
 
 // Mean particle.
 double particleGun.mean =  -1;

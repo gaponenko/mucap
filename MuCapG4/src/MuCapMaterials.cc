@@ -17,7 +17,7 @@
 namespace mu2e {
 
   void MuCapMaterials::construct(){
-    using CLHEP::g;
+    using CLHEP::mg;
     using CLHEP::cm3;
 
     int ncomp=0, natoms=0;
@@ -27,7 +27,7 @@ namespace mu2e {
     const double gasDensityFactorFrom15C = (15 + temperature0)/absDetectorTemperature;
 
     //----------------------------------------------------------------
-    const double cf4_density_at_15C = 3.72 * g/cm3;
+    const double cf4_density_at_15C = 3.72 * mg/cm3;
     G4Material *cf4 =
       new G4Material("MUCAP_CF4", cf4_density_at_15C * gasDensityFactorFrom15C, ncomp=2);
 
@@ -35,7 +35,7 @@ namespace mu2e {
     cf4->AddElement(getElementOrThrow("F"), natoms=4);
 
     //----------------------------------------------------------------
-    const double dme_density_at_15C = 1.97 * g/cm3;
+    const double dme_density_at_15C = 1.97 * mg/cm3;
     G4Material *dme =
       new G4Material("MUCAP_DME", dme_density_at_15C * gasDensityFactorFrom15C, ncomp=3);
 
@@ -44,7 +44,7 @@ namespace mu2e {
     dme->AddElement(getElementOrThrow("H"), natoms=6);
 
     //----------------------------------------------------------------
-    const double isobutane_density_at_15C = 2.51 * g/cm3;
+    const double isobutane_density_at_15C = 2.51 * mg/cm3;
     G4Material *isobutane =
       new G4Material("MUCAP_ISOBUTANE", isobutane_density_at_15C * gasDensityFactorFrom15C, ncomp=2);
 
@@ -75,8 +75,8 @@ namespace mu2e {
 
     std::cout<<"MUCAP_CRADLE_GAS: N2 volume fraction = "<<n2VolumeFraction
              <<", mass fraction = "<<n2MassFraction
-             <<", density = "<<(cradleGasDensity)/(g/cm3)
-             <<" g/cm3"<<std::endl;
+             <<", density = "<<(cradleGasDensity)/(mg/cm3)
+             <<" mg/cm3"<<std::endl;
 
     G4Material *cradlegas = new G4Material("MUCAP_CRADLE_GAS", cradleGasDensity, ncomp=2);
 
