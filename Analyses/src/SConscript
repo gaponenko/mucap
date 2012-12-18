@@ -33,6 +33,7 @@ if re.match(r'^/', local_lib_path):
 local_lib_name=re.sub(r'/', r'_', local_lib_path)
 
 my_libs=[ 
+    'MuCapDataProducts',
     'Mu2eInterfaces',
     'Mu2eUtilities',
     'CLHEP'

@@ -54,6 +54,7 @@
 #include "GeomPrimitives/inc/TubsParams.hh"
 
 #include "MuCapG4/inc/MuCapSD.hh"
+#include "MuCapDataProducts/inc/WireCellId.hh"
 
 //#define AGDEBUG(stuff) do { std::cerr<<"AG: "<<__FILE__<<", line "<<__LINE__<<", func "<<__func__<<": "<<stuff<<std::endl; } while(0)
 //#define AGDEBUG(stuff)
@@ -337,6 +338,8 @@ namespace mu2e {
        const CLHEP::Hep3Vector
          cellCenterInParent(rot->inverse()*CLHEP::Hep3Vector(0.5*(xmax+xmin), 0, 0.5*(driftZmax + driftZmin)));
 
+       const WireCellId cid(WirePlaneId(globalPlaneNumber), icell);
+
         ostringstream osname;
         osname<<"driftPlane_"<<std::setw(2)<<std::setfill('0')<<globalPlaneNumber<<"_"<<icell;
         VolumeInfo cellVI(nestBox(osname.str(),
@@ -345,7 +348,7 @@ namespace mu2e {
                                   rot,
                                   cellCenterInParent,
                                   parent,
-                                  1000*globalPlaneNumber + icell, // volume copy number
+                                  cid.encodeToInteger(),
                                   detail.get<bool>("driftCellVisible"),
                                   G4Colour::Cyan(),
                                   detail.get<bool>("driftCellSolid"),
@@ -361,7 +364,7 @@ namespace mu2e {
         const ParameterSet wire(detail.get<ParameterSet>("wire"));
         TubsParams wirePars(0./* rIn */, 0.5*wire.get<double>("diameter"), yHalfSize);
         ostringstream wirename;
-        wirename<<"wire_"<<std::setw(5)<<std::setfill('0')<<1000*globalPlaneNumber + icell;
+        wirename<<"wire_"<<std::setw(5)<<std::setfill('0')<<cid.encodeToInteger();
         nestTubs(wirename.str(),
                  wirePars,
                  findMaterialOrThrow(wire.get<string>("material")),
