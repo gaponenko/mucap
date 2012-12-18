@@ -52,10 +52,16 @@ namespace mu2e {
     isobutane->AddElement(getElementOrThrow("H"), natoms=10);
 
     //----------------------------------------------------------------
-    const double cf4MassFraction = pset_.get<double>("pcGasCF4MassFraction");
+    const double cf4VolumeFraction = pset_.get<double>("pcGasCF4VolumeFraction");
+    const double cf4MassFraction = cf4VolumeFraction * cf4->GetDensity()
+      /(cf4VolumeFraction * cf4->GetDensity() + (1-cf4VolumeFraction)*isobutane->GetDensity());
 
-    const double pcGasDensity = 1./
-      (cf4MassFraction/cf4->GetDensity() + (1-cf4MassFraction)/isobutane->GetDensity());
+    const double pcGasDensity =
+      cf4VolumeFraction*cf4->GetDensity() + (1-cf4VolumeFraction)*isobutane->GetDensity();
+
+    std::cout<<"MUCAP_PC_GAS: CF4 volume fraction = "<<cf4VolumeFraction
+             <<", mass fraction = "<<cf4MassFraction
+             <<", density = "<<(pcGasDensity)/(mg/cm3)<<" mg/cm3"<<std::endl;
 
     G4Material *pcgas = new G4Material("MUCAP_PC_GAS", pcGasDensity, ncomp=2);
 

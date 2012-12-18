@@ -7,7 +7,7 @@ BEGIN_PROLOG
 //================================================================
 mucapMaterials : {
     TCelsius : 20
-    pcGasCF4MassFraction : 0.8
+    pcGasCF4VolumeFraction : 0.8
     cradleGasN2VolumeFraction : 0.03
     printElements : false
     printMaterials : false
