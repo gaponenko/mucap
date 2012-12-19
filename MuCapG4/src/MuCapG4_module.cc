@@ -108,7 +108,6 @@ namespace mucap {
   private:
     auto_ptr<Mu2eG4RunManager> _runManager;
 
-    fhicl::ParameterSet _geomPars;
     fhicl::ParameterSet _materialPars;
 
     // Do we issue warnings about multiple runs?
@@ -161,7 +160,6 @@ namespace mucap {
 
   MuCapG4::MuCapG4(fhicl::ParameterSet const& pset):
     _runManager(0),
-    _geomPars(pset.get<fhicl::ParameterSet>("geometry")),
     _materialPars(pset.get<fhicl::ParameterSet>("materials")),
     _warnEveryNewRun(pset.get<bool>("warnEveryNewRun",false)),
     _exportPDTStart(pset.get<bool>("exportPDTStart",false)),
@@ -287,8 +285,9 @@ namespace mucap {
     // Create user actions and register them with G4.
     _runManager->SetVerboseLevel(_rmvlevel);
 
+    art::ServiceHandle<mucap::Geometry> gmucap;
     _runManager->SetUserInitialization(new WorldMaker<MuCapWorld, MuCapMaterials>
-                                       (std::auto_ptr<MuCapWorld>(new MuCapWorld(_geomPars)),
+                                       (std::auto_ptr<MuCapWorld>(new MuCapWorld(*gmucap)),
                                         std::auto_ptr<MuCapMaterials>(new MuCapMaterials(_materialPars)))
                                        );
 

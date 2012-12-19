@@ -63,10 +63,10 @@ namespace mucap {
   const std::string MuCapWorld::targetModuleType_("targetModule");
 
   //================================================================
-  MuCapWorld::MuCapWorld(const ParameterSet& geom)
-    : geom_(geom)
-    , forceAuxEdgeVisible_(geom.get<bool>("forceAuxEdgeVisible"))
-    , doSurfaceCheck_(geom.get<bool>("doSurfaceCheck"))
+  MuCapWorld::MuCapWorld(const Geometry& geom)
+    : geom_(&geom)
+    , forceAuxEdgeVisible_(geom.pset().get<bool>("forceAuxEdgeVisible"))
+    , doSurfaceCheck_(geom.pset().get<bool>("doSurfaceCheck"))
     , placePV_(true)
   {}
 
@@ -82,12 +82,12 @@ namespace mucap {
   // This is the callback called by G4
   G4VPhysicalVolume * MuCapWorld::construct(){
 
-    const ParameterSet world(geom_.get<ParameterSet>("world"));
+    const ParameterSet world(geom_->pset().get<ParameterSet>("world"));
 
     //----------------------------------------------------------------
     // instantiateSensitiveDetectors
     G4SDManager* SDman      = G4SDManager::GetSDMpointer();
-    SDman->AddNewDetector(new MuCapSD(geom_.get<ParameterSet>("cellSD")));
+    SDman->AddNewDetector(new MuCapSD(geom_->pset().get<ParameterSet>("cellSD")));
 
     //----------------------------------------------------------------
     // the canonical World volume
@@ -141,7 +141,7 @@ namespace mucap {
     }
 
     //----------------------------------------------------------------
-    vector<ParameterSet> modulePars(geom_.get<vector<ParameterSet> >("chamberModules"));
+    vector<ParameterSet> modulePars(geom_->pset().get<vector<ParameterSet> >("chamberModules"));
     for(unsigned i = 0, wpoff=0; i < modulePars.size(); ++i) {
       wpoff += constructChamberModule(i, wpoff, modulePars[i], worldVInfo);
     }
@@ -170,8 +170,8 @@ namespace mucap {
                                               )
   {
     const string moduleType(pars.get<string>("type"));
-    const ParameterSet detail(geom_.get<ParameterSet>(moduleType));
-    const ParameterSet cathode(geom_.get<ParameterSet>("cathode"));
+    const ParameterSet detail(geom_->pset().get<ParameterSet>(moduleType));
+    const ParameterSet cathode(geom_->pset().get<ParameterSet>("cathode"));
 
     const ParameterSet
       centralFoil( (moduleType == targetModuleType_) ?
@@ -302,7 +302,7 @@ namespace mucap {
       const unsigned ncells = detail.get<unsigned>("nwires");
       const double dx = detail.get<double>("wireSpacing");
 
-      const double chamberRadius = geom_.get<ParameterSet>("cathode").get<double>("radius");
+      const double chamberRadius = geom_->pset().get<ParameterSet>("cathode").get<double>("radius");
       const double safety = 0.5; // mm
 
       using namespace CLHEP;

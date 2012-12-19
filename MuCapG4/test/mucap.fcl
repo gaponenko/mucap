@@ -49,7 +49,6 @@ physics : {
 
             generatorModuleLabel : generate
 
-            geometry: @local::mucapGeometry
             materials: @local::mucapMaterials
 
 //            visMacro             : "MuCapG4/test/vis_mucap.mac"
