@@ -20,8 +20,11 @@ vector<double> particleGun.point = {0., 0., 0.};
 string particleGun.sourceShape = "cylinder_z";
 vector<double> particleGun.halfLength = { 3., 3., 0.0305 }; // 6mm and half of 71 um
 
+// 2.5 MeV = 68.54 MeV/c
+// 5.0 MeV = 96.99 MeV/c
+// 7.5 MeV = 118.87 MeV/c
 // Limits on momentum: (MeV)
-double particleGun.pmin = 96.99; // 5MeV=96.99MeV/c
+double particleGun.pmin = 96.99;
 double particleGun.pmax = 96.99;
 
 int particleGun.id = 2212;
