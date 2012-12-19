@@ -8,3 +8,5 @@ tmp
 *.root
 *.log
 .tup
+/postproc/*.pdf
+/postproc/*.png
