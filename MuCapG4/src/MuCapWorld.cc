@@ -42,14 +42,8 @@
 
 // Mu2e includes
 #include "G4Helper/inc/G4Helper.hh"
-#include "Mu2eG4/inc/constructStudyEnv_v001.hh"
 #include "Mu2eG4/inc/findMaterialOrThrow.hh"
 #include "Mu2eG4/inc/nestBox.hh"
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
-#include "GeometryService/inc/WorldG4.hh"
-#include "BFieldGeom/inc/BFieldConfig.hh"
-#include "BFieldGeom/inc/BFieldManager.hh"
 #include "Mu2eG4/inc/nestTubs.hh"
 #include "GeomPrimitives/inc/TubsParams.hh"
 
@@ -60,9 +54,10 @@
 //#define AGDEBUG(stuff)
 
 
-namespace mu2e {
+namespace mucap {
 
   using namespace std;
+  using namespace mu2e;
   using fhicl::ParameterSet;
 
   const std::string MuCapWorld::targetModuleType_("targetModule");
@@ -371,7 +366,7 @@ namespace mu2e {
                  wireInCellRotation,
                  Hep3Vector(0, 0, zwire - cellCenterInParent.z()),
                  cellVI,
-                 1000*globalPlaneNumber + icell, // copy number
+                 cid.encodeToInteger(), // copy number
                  wire.get<bool>("visible"),
                  G4Colour::Yellow(),
                  wire.get<bool>("solid"),
@@ -384,4 +379,4 @@ namespace mu2e {
     }
 
   //================================================================
-} // end namespace mu2e
+} // end namespace mucap

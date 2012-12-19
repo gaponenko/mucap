@@ -14,7 +14,7 @@
 
 #include "Mu2eG4/inc/findMaterialOrThrow.hh"
 
-namespace mu2e {
+namespace mucap {
 
   void MuCapMaterials::construct(){
     using CLHEP::mg;
@@ -69,8 +69,8 @@ namespace mu2e {
     pcgas->AddMaterial(isobutane, (1-cf4MassFraction));
 
     //----------------------------------------------------------------
-    G4Material *G4He = findMaterialOrThrow("G4_He");
-    G4Material *G4N2 = findMaterialOrThrow("G4_N");
+    G4Material *G4He = mu2e::findMaterialOrThrow("G4_He");
+    G4Material *G4N2 = mu2e::findMaterialOrThrow("G4_N");
 
     const double n2VolumeFraction = pset_.get<double>("cradleGasN2VolumeFraction");
     const double n2MassFraction = n2VolumeFraction * G4N2->GetDensity()
@@ -117,4 +117,4 @@ namespace mu2e {
     return answer;
   }
 
-} // end namespace mu2e
+} // end namespace mucap

@@ -86,9 +86,10 @@
 #include <memory>
 #include <iomanip>
 
-using namespace std;
+namespace mucap {
 
-namespace mu2e {
+  using namespace std;
+  using namespace mu2e;
 
   class MuCapG4 : public art::EDProducer {
 
@@ -452,7 +453,6 @@ namespace mu2e {
 
   }
 
-} // End of namespace mu2e
+} // End of namespace mucap
 
-using mu2e::MuCapG4;
-DEFINE_ART_MODULE(MuCapG4);
+DEFINE_ART_MODULE(mucap::MuCapG4);

@@ -7,20 +7,20 @@
 
 #include "MuCapDataProducts/inc/WireCellId.hh"
 
-namespace mu2e {
+namespace mu2e { class StepPointMC; }
 
-  class StepPointMC;
+namespace mucap {
 
   class MuCapSimHit {
   public:
 
-    explicit MuCapSimHit(const StepPointMC& sp);
+    explicit MuCapSimHit(const mu2e::StepPointMC& sp);
 
-    const StepPointMC& hit() const { return *sp_; }
+    const mu2e::StepPointMC& hit() const { return *sp_; }
     const WireCellId&  cid() const { return cid_; }
 
   private:
-    const StepPointMC *sp_;
+    const mu2e::StepPointMC *sp_;
     WireCellId cid_;
 
   };
@@ -28,4 +28,5 @@ namespace mu2e {
   std::ostream& operator<<(std::ostream& os, const MuCapSimHit& sh);
 
 }
+
 #endif /* MuCapDataProducts_inc_MuCapSimHit_hh */

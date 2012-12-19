@@ -12,19 +12,19 @@
 
 #include "MCDataProducts/inc/StepPointMCCollection.hh"
 
-namespace mu2e {
+namespace mu2e { class PhysicsProcessInfo; }
 
-  class PhysicsProcessInfo;
+namespace mucap {
 
   // This class should not derive from Mu2eSensitiveDetector because the latter
   // presumes a wrong type for the hit collection.
   class MuCapSD : public G4VSensitiveDetector {
 
     // Non-ownning pointer and object that returns code describing physics processes.
-    PhysicsProcessInfo* processInfo_;
+    mu2e::PhysicsProcessInfo* processInfo_;
 
     // Non-owning pointer to the  collection into which hits will be added.
-    StepPointMCCollection* collection_;
+    mu2e::StepPointMCCollection* collection_;
 
     // Information about the SimParticleCollection, needed to instantiate art::Ptr.
     const art::ProductID *simID_;
@@ -44,12 +44,12 @@ namespace mu2e {
 
     virtual void EndOfEvent(G4HCofThisEvent*);
 
-    void beforeG4Event(StepPointMCCollection *outputHits,
-                       PhysicsProcessInfo *processInfo,
+    void beforeG4Event(mu2e::StepPointMCCollection *outputHits,
+                       mu2e::PhysicsProcessInfo *processInfo,
                        const art::ProductID& simID,
                        const art::Event& event);
   };
 
-} // namespace mu2e
+} // namespace mucap
 
 #endif /* MuCapG4_MuCapSD_hh */

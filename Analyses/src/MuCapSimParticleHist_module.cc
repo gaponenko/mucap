@@ -13,12 +13,16 @@
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 
-#include "MCDataProducts/inc/StepPointMCCollection.hh"
+#include "MCDataProducts/inc/SimParticle.hh"
+#include "MCDataProducts/inc/SimParticleCollection.hh"
 
 #include "TH1.h"
 #include "TH2.h"
 
-namespace mu2e {
+namespace mucap {
+
+  using mu2e::SimParticle;
+  using mu2e::SimParticleCollection;
 
   //================================================================
   class MuCapSimParticleHist : public art::EDAnalyzer {
@@ -94,6 +98,6 @@ namespace mu2e {
   }
 
   //================================================================
-} // namespace mu2e
+} // namespace mucap
 
-DEFINE_ART_MODULE(mu2e::MuCapSimParticleHist);
+DEFINE_ART_MODULE(mucap::MuCapSimParticleHist);

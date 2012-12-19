@@ -7,7 +7,7 @@
 
 #include "MuCapDataProducts/inc/WirePlaneId.hh"
 
-namespace mu2e {
+namespace mucap {
 
   class WireCellId {
   public:
@@ -46,4 +46,5 @@ namespace mu2e {
   //----------------------------------------------------------------
   std::ostream& operator<<( std::ostream& os, const WireCellId& id);
 }
+
 #endif /* MuCapDataProducts_inc_WireCellId_hh */

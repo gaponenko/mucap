@@ -1,6 +1,6 @@
 #include "MuCapDataProducts/inc/WireCellId.hh"
 
-namespace mu2e {
+namespace mucap {
 
   WireCellId::WireCellId(const WirePlaneId& plane, unsigned int cell)
     : plane_(plane)

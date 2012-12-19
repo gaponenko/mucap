@@ -5,7 +5,7 @@
 
 #include <ostream>
 
-namespace mu2e {
+namespace mucap {
 
   class WirePlaneId {
   public:

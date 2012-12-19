@@ -8,7 +8,7 @@
 class G4Element;
 class G4String;
 
-namespace mu2e {
+namespace mucap {
 
   class MuCapMaterials {
   public:
@@ -27,5 +27,6 @@ namespace mu2e {
     G4Element* getElementOrThrow(const G4String& name);
   };
 
-} // end namespace mu2e
+} // end namespace mucap
+
 #endif /* MuCapG4_inc_MuCapMaterials_hh */

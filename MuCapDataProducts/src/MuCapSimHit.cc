@@ -2,9 +2,9 @@
 
 #include "MCDataProducts/inc/StepPointMC.hh"
 
-namespace mu2e {
+namespace mucap {
 
-  MuCapSimHit::MuCapSimHit(const StepPointMC& sp)
+  MuCapSimHit::MuCapSimHit(const mu2e::StepPointMC& sp)
     : sp_(&sp)
     , cid_(WireCellId::decodeFromInteger(sp.volumeId()))
   {}

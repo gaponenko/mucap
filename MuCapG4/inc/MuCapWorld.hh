@@ -8,10 +8,11 @@
 #include "Mu2eG4/inc/Mu2eUniverse.hh"
 class G4VPhysicalVolume;
 
-namespace mu2e {
-  class VolumeInfo;
+namespace mu2e { class VolumeInfo; }
 
-  class MuCapWorld : public Mu2eUniverse {
+namespace mucap {
+
+  class MuCapWorld : public mu2e::Mu2eUniverse {
     fhicl::ParameterSet geom_;
 
     bool forceAuxEdgeVisible_;
@@ -24,13 +25,13 @@ namespace mu2e {
     unsigned constructChamberModule(unsigned moduleNumber,
                                     unsigned planeNumberOffset,
                                     const fhicl::ParameterSet& modulePars,
-                                    const VolumeInfo& parent);
+                                    const mu2e::VolumeInfo& parent);
 
     void constructFoil(unsigned imodule,
                        unsigned ifoil,
                        const fhicl::ParameterSet& foilPars,
                        const CLHEP::Hep3Vector& centerInParent,
-                       const VolumeInfo& parent);
+                       const mu2e::VolumeInfo& parent);
 
     void constructDriftPlane(unsigned globalPlaneNumber,
                              const fhicl::ParameterSet& detail,
@@ -38,7 +39,7 @@ namespace mu2e {
                              double zwire, // in parent
                              double driftZmin, // in parent
                              double driftZmax, // in parent
-                             const VolumeInfo& parent
+                             const mu2e::VolumeInfo& parent
                              );
   public:
 
@@ -51,6 +52,6 @@ namespace mu2e {
     G4VPhysicalVolume * construct();
   };
 
-} // end namespace mu2e
+} // end namespace mucap
 
 #endif /* MuCapG4_inc_MuCapWorld_hh */

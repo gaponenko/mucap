@@ -14,7 +14,9 @@
 #include "MCDataProducts/inc/StepPointMCCollection.hh"
 #include "Mu2eG4/inc/PhysicsProcessInfo.hh"
 
-namespace mu2e {
+namespace mucap {
+
+  using namespace mu2e;
 
   //================================================================
   const std::string& MuCapSD::name() {
@@ -101,4 +103,4 @@ namespace mu2e {
 
   //================================================================
 
-} //namespace mu2e
+} //namespace mucap

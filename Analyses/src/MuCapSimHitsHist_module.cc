@@ -21,7 +21,9 @@
 #include "TH1.h"
 #include "TH2.h"
 
-namespace mu2e {
+namespace mucap {
+
+  using mu2e::StepPointMCCollection;
 
   //================================================================
   class MuCapSimHitsHist : public art::EDAnalyzer {
@@ -99,6 +101,6 @@ namespace mu2e {
   }
 
   //================================================================
-} // namespace mu2e
+} // namespace mucap
 
-DEFINE_ART_MODULE(mu2e::MuCapSimHitsHist);
+DEFINE_ART_MODULE(mucap::MuCapSimHitsHist);
