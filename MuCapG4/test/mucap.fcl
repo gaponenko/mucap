@@ -35,10 +35,31 @@ physics : {
     producers:  {
 
         generate: {
-            module_type          : EventGenerator
-            inputfile            : "MuCapG4/test/muCapGun.txt"
-            allowReplacement     : true
-            messageOnReplacement : true
+            module_type : MuCapGun
+
+            pdgId : 2212
+
+            position : {
+                shape : targetCylinder
+                radius : 3 // mm
+            }
+
+            kineticEnergy : {
+                spectrum : flat
+                center : 5 // MeV
+                halfWidth : 0
+            }
+
+            angles : {
+                czmin : -1
+                czmax : +1
+            }
+
+            time : {
+                spectrum : flat
+                center : 0
+                halfWidth : 0
+            }
         }
 
         g4run: {
