@@ -17,6 +17,7 @@
 namespace mucap {
 
   void MuCapMaterials::construct(){
+    using CLHEP::g;
     using CLHEP::mg;
     using CLHEP::cm3;
 
@@ -88,6 +89,16 @@ namespace mucap {
 
     cradlegas->AddMaterial(G4N2, n2MassFraction);
     cradlegas->AddMaterial(G4He, 1-n2MassFraction);
+
+    //----------------------------------------------------------------
+    // FR4 was sometimes referred to as "G10" in TWIST, but is a
+    // different newer material.  This is a fiberglass-epoxy
+    // composite.  For the lack of better information I'll use
+    // pre-defined G4 plastic and glass materials to build it.
+
+    G4Material *fr4 = new G4Material("MUCAP_FR4", 1.85*g/cm3, ncomp=2);
+    fr4->AddMaterial(mu2e::findMaterialOrThrow("G4_BAKELITE"), 0.44);
+    fr4->AddMaterial(mu2e::findMaterialOrThrow("G4_Pyrex_Glass"), 0.56);
 
     //----------------------------------------------------------------
     // Print element table, if requested.

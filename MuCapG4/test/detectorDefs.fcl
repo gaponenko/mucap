@@ -40,6 +40,13 @@ mucapGeometry : {
         solid : false
     }
 
+    cathodeSupport : {
+        thickness     : 3.2 // mm
+        material : "MUCAP_FR4"
+        visible : true
+        solid : false
+    }
+
     glassFrame : {
         rmin : 196
         rmax : 300

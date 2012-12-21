@@ -173,6 +173,7 @@ namespace mucap {
     const ParameterSet detail(geom_->pset().get<ParameterSet>(moduleType));
     const ParameterSet cathode(geom_->pset().get<ParameterSet>("cathode"));
     const ParameterSet glassFrame(geom_->pset().get<ParameterSet>("glassFrame"));
+    const ParameterSet cathodeSupport(geom_->pset().get<ParameterSet>("cathodeSupport"));
 
     const ParameterSet
       centralFoil( (moduleType == targetModuleType_) ?
@@ -229,8 +230,9 @@ namespace mucap {
 
     for(unsigned ifoil = 0; ifoil < zfoil.size(); ++ifoil) {
       const CLHEP::Hep3Vector foilCenterInParent(0,0, zfoil[ifoil] - zcenter);
+      const ParameterSet& foilPars = ((ifoil==iTargetFoil)? centralFoil : cathode);
       constructFoil(moduleNumber, ifoil,
-                    ((ifoil==iTargetFoil)? centralFoil : cathode),
+                    foilPars,
                     foilCenterInParent,
                     modInfo
                     );
@@ -240,6 +242,15 @@ namespace mucap {
                           foilCenterInParent, // FIXME: z position is approximate
                           modInfo
                           );
+
+      // Fill the radial gap between the foil and the frame
+      constructCathodeSupport(moduleNumber, ifoil,
+                              cathodeSupport,
+                              foilPars.get<double>("radius"),
+                              glassFrame.get<double>("rmin"),
+                              foilCenterInParent, // FIXME: z position is approximate
+                              modInfo
+                              );
     }
 
     // Create the drift cells and install wires
@@ -295,6 +306,34 @@ namespace mucap {
                                 doSurfaceCheck_
                                 ));
   }
+
+  //================================================================
+  void MuCapWorld::constructCathodeSupport(unsigned imodule,
+                                           unsigned iframe,
+                                           const fhicl::ParameterSet& supportPars,
+                                           double rIn, double rOut,
+                                           const CLHEP::Hep3Vector& centerInParent,
+                                           const mu2e::VolumeInfo& parent)
+  {
+    ostringstream osname;
+    osname<<"cathodeSupport_"<<std::setw(2)<<std::setfill('0')<<imodule<<"_"<<iframe;
+    TubsParams params(rIn, rOut, 0.5*supportPars.get<double>("thickness"));
+    VolumeInfo modInfo(nestTubs(osname.str(),
+                                params,
+                                findMaterialOrThrow(supportPars.get<string>("material")),
+                                0, // no rotation
+                                centerInParent,
+                                parent,
+                                0,
+                                supportPars.get<bool>("visible"),
+                                G4Colour(0.71, 0.40, 0.11), // light brown
+                                supportPars.get<bool>("solid"),
+                                forceAuxEdgeVisible_,
+                                placePV_,
+                                doSurfaceCheck_
+                                ));
+  }
+
 
   //================================================================
   void MuCapWorld::constructGlassFrame(unsigned imodule,
