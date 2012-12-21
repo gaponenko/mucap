@@ -40,6 +40,15 @@ mucapGeometry : {
         solid : false
     }
 
+    glassFrame : {
+        rmin : 196
+        rmax : 300
+        thickness : 3.18 // detector paper
+        material : "G4_Pyrex_Glass"
+        visible : true
+        solid : false
+    }
+
     pcModule : {
         material : "MUCAP_PC_GAS"
         nwires : 160

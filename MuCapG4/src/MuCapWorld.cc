@@ -172,6 +172,7 @@ namespace mucap {
     const string moduleType(pars.get<string>("type"));
     const ParameterSet detail(geom_->pset().get<ParameterSet>(moduleType));
     const ParameterSet cathode(geom_->pset().get<ParameterSet>("cathode"));
+    const ParameterSet glassFrame(geom_->pset().get<ParameterSet>("glassFrame"));
 
     const ParameterSet
       centralFoil( (moduleType == targetModuleType_) ?
@@ -233,6 +234,12 @@ namespace mucap {
                     foilCenterInParent,
                     modInfo
                     );
+
+      constructGlassFrame(moduleNumber, ifoil,
+                          glassFrame,
+                          foilCenterInParent, // FIXME: z position is approximate
+                          modInfo
+                          );
     }
 
     // Create the drift cells and install wires
@@ -283,6 +290,36 @@ namespace mucap {
                                 foilPars.get<bool>("visible"),
                                 G4Colour::Gray(),
                                 foilPars.get<bool>("solid"),
+                                forceAuxEdgeVisible_,
+                                placePV_,
+                                doSurfaceCheck_
+                                ));
+  }
+
+  //================================================================
+  void MuCapWorld::constructGlassFrame(unsigned imodule,
+                                       unsigned iframe,
+                                       const ParameterSet& framePars,
+                                       const CLHEP::Hep3Vector& centerInParent,
+                                       const VolumeInfo& parent)
+  {
+    ostringstream osname;
+    osname<<"glassFrame_"<<std::setw(2)<<std::setfill('0')<<imodule<<"_"<<iframe;
+
+    TubsParams params(framePars.get<double>("rmin"),
+                      framePars.get<double>("rmax"),
+                      0.5*framePars.get<double>("thickness"));
+
+    VolumeInfo modInfo(nestTubs(osname.str(),
+                                params,
+                                findMaterialOrThrow(framePars.get<string>("material")),
+                                0, // no rotation
+                                centerInParent,
+                                parent,
+                                0,
+                                framePars.get<bool>("visible"),
+                                G4Colour::Gray(),
+                                framePars.get<bool>("solid"),
                                 forceAuxEdgeVisible_,
                                 placePV_,
                                 doSurfaceCheck_

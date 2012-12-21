@@ -36,6 +36,12 @@ namespace mucap {
                        const CLHEP::Hep3Vector& centerInParent,
                        const mu2e::VolumeInfo& parent);
 
+    void constructGlassFrame(unsigned imodule,
+                             unsigned iframe,
+                             const fhicl::ParameterSet& framePars,
+                             const CLHEP::Hep3Vector& centerInParent,
+                             const mu2e::VolumeInfo& parent);
+
     void constructDriftPlane(unsigned globalPlaneNumber,
                              const fhicl::ParameterSet& detail,
                              double planeRotation, // radians
