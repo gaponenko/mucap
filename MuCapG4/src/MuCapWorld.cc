@@ -237,10 +237,13 @@ namespace mucap {
                     modInfo
                     );
 
+      // The mechanical structures are created outside of the drift gas volume
+      // so the parent voume is He/N2 and the center representation is different
+      const CLHEP::Hep3Vector foilCenterInHe(0,0, zfoil[ifoil]);
       constructGlassFrame(moduleNumber, ifoil,
                           glassFrame,
-                          foilCenterInParent, // FIXME: z position is approximate
-                          modInfo
+                          foilCenterInHe, // FIXME: approximate frame position
+                          parent
                           );
 
       // Fill the radial gap between the foil and the frame
@@ -248,8 +251,8 @@ namespace mucap {
                               cathodeSupport,
                               foilPars.get<double>("radius"),
                               glassFrame.get<double>("rmin"),
-                              foilCenterInParent, // FIXME: z position is approximate
-                              modInfo
+                              foilCenterInHe, // FIXME: approximate FR4 position
+                              parent
                               );
     }
 
