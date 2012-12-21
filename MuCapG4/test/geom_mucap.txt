@@ -3,8 +3,7 @@ string detector.name           = "twist";
 // Tell GeometryService to ignore the normal Mu2e stuff
 bool mu2e.standardDetector = false;
 
-vector<string> mu2e.materials = {"WAGVacuum"};
-bool           mu2e.printParticleDataTable = false;
+bool mu2e.printParticleDataTable = false;
 
 // Use a decent physics list
 string g4.physicsListName      = "QGSP_BERT_HP";
