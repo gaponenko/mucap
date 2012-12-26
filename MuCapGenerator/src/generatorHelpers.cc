@@ -4,6 +4,7 @@
 #include <vector>
 #include <stdexcept>
 #include <sstream>
+#include <limits>
 
 #include "cetlib/exception.h"
 #include "fhiclcpp/ParameterSet.h"
@@ -21,6 +22,7 @@
 #include "MuCapGenerator/inc/AngleGenUniform.hh"
 #include "MuCapGenerator/inc/SpectrumGenFlat.hh"
 #include "MuCapGenerator/inc/SpectrumGenMECO.hh"
+#include "MuCapGenerator/inc/SpectrumGenExp.hh"
 
 #include "MuCapUtilities/inc/mecoSpectrum.hh"
 
@@ -82,6 +84,14 @@ namespace mucap {
 
       return std::auto_ptr<ISpectrumGenerator>
         (new SpectrumGenMECO(pars, eng, pset.get<unsigned>("maxIter", 1000)));
+    }
+    //----------------------------------------------------------------
+    else if(spectrum == "exp") {
+      return std::auto_ptr<ISpectrumGenerator>
+        (new SpectrumGenExp(pset.get<double>("scale"),
+                            pset.get<double>("min", 0),
+                            pset.get<double>("max", std::numeric_limits<double>::max()),
+                            eng));
     }
     //----------------------------------------------------------------
     throw cet::exception("GEOM")<<__func__<<": unknown spectrum setting \""<<spectrum<<"\"\n";
