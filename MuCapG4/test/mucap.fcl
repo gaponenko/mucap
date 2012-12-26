@@ -61,6 +61,19 @@ physics : {
                 center : 0
                 halfWidth : 0
             }
+
+            histograms : {
+                kineticEnergy : {
+                    xmin : 0
+                    xmax : 100
+                    nbins : 500
+                }
+                momentum : {
+                    xmin : 0
+                    xmax : 500
+                    nbins : 500
+                }
+            }
         }
 
         g4run: {
