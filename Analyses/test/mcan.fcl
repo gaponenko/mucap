@@ -29,8 +29,13 @@ physics : {
         }
         mchits : {
             module_type : MuCapSimHitsHist
-            inputModuleLabel : "g4run"
-            inputInstanceName : "MuCapSimHits"
+            hitsModuleLabel : "g4run"
+            hitsInstanceName : "MuCapSimHits"
+            particlesModuleLabel : "g4run"
+
+            numEnergyBins : 1000
+            ekMin : 0
+            ekMax : 100
         }
     }
 
