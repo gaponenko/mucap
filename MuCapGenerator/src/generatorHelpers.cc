@@ -20,6 +20,9 @@
 #include "MuCapGenerator/inc/PosGenCylinder.hh"
 #include "MuCapGenerator/inc/AngleGenUniform.hh"
 #include "MuCapGenerator/inc/SpectrumGenFlat.hh"
+#include "MuCapGenerator/inc/SpectrumGenMECO.hh"
+
+#include "MuCapUtilities/inc/mecoSpectrum.hh"
 
 
 namespace mucap {
@@ -68,7 +71,18 @@ namespace mucap {
                              pset.get<double>("halfWidth"),
                              eng));
     }
+    //----------------------------------------------------------------
+    else if(spectrum == "MECO") {
 
+      MECOPars pars;
+      pars.A = 1;
+      pars.Tth = pset.get<double>("Tth");
+      pars.alpha = pset.get<double>("alpha");
+      pars.T0 = pset.get<double>("T0");
+
+      return std::auto_ptr<ISpectrumGenerator>
+        (new SpectrumGenMECO(pars, eng, pset.get<unsigned>("maxIter", 1000)));
+    }
     //----------------------------------------------------------------
     throw cet::exception("GEOM")<<__func__<<": unknown spectrum setting \""<<spectrum<<"\"\n";
 

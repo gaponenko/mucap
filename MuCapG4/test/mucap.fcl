@@ -45,9 +45,10 @@ physics : {
             }
 
             kineticEnergy : {
-                spectrum : flat
-                center : 5 // MeV
-                halfWidth : 0
+                spectrum : MECO
+                Tth : 1.4 // MeV
+                alpha : 1.3279
+                T0 : 3.1 // MeV
             }
 
             angles : {
