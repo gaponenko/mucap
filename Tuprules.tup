@@ -1,0 +1,26 @@
+CFLAGS += -fno-omit-frame-pointer -rdynamic -fPIC
+CFLAGS += -Wall
+CFLAGS += -O
+CFLAGS += -I`root-config --incdir`
+
+LDFLAGS += `root-config --libs`
+
+export BOOST_INC
+export BOOST_LIB
+export CETLIB_INC
+export CETLIB_LIB
+export CPP0X_INC
+export CPP0X_LIB
+export FHICLCPP_INC
+export FHICLCPP_LIB
+
+export ROOTSYS
+export LD_LIBRARY_PATH
+
+!cc = |> g++ $(CFLAGS) -I$FHICLCPP_INC -I$CPP0X_INC -I$CETLIB_INC -I$BOOST_INC -c %f -o %o |> %B.o
+!ldmain = |> g++ $(LDFLAGS) \
+	-L$FHICLCPP_LIB -lfhiclcpp \
+	 -L$CPP0X_LIB \
+	 -L$CETLIB_LIB -lcetlib \
+	 -L$BOOST_LIB \
+	%f -o %o |>

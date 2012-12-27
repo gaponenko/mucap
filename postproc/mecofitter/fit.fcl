@@ -1,0 +1,21 @@
+mc_inputs : {
+    filename : "/data/mucap/20121226-c-expfull/exp_all.root"
+    histogram : "mchits/numCellPlane3d"
+}
+
+data_inputs : {
+    filename : "/data/mucap/20121226-d-mecoan/good/00000/mcanalysis.root"
+    histogram : "mchits/numCellPlane2d"
+}
+
+cuts : {
+    minProjectedMCBinContent : 5
+    minPlanes : 1
+    maxPlanes : 28
+    minCells : 1
+    maxCells : 100
+}
+
+outputs : {
+    filename : "out.root"
+}

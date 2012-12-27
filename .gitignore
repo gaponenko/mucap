@@ -10,3 +10,5 @@ tmp
 .tup
 /postproc/*.pdf
 /postproc/*.png
+*.o
+postproc/mecofitter/mecofitter
