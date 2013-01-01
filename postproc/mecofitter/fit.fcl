@@ -16,6 +16,12 @@ cuts : {
     maxCells : 100
 }
 
+minimizer : {
+    type : "Minuit2" strategy : "Migrad"
+    ///type : "Minuit2" strategy : "Scan" // "Simplex" // "Migrad"
+    ///type : "GSLMultiMin" strategy : "ConjugateFR"
+}
+
 outputs : {
     filename : "out.root"
 }
