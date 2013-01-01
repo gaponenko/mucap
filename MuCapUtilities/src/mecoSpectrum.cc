@@ -8,6 +8,12 @@ double mucap::mecoSpectrum(double T, const MECOPars& pars) {
 }
 
 //================================================================
+std::ostream& mucap::operator<<(std::ostream& os, const mucap::MECOPars& p) {
+  return os<<"MECOPars(A="<<p.A<<", Tth="<<p.Tth<<", alpha="<<p.alpha<<", T0="<<p.T0<<")";
+}
+
+
+//================================================================
 // g++  -o mecoSpectrum -DBUILD_TEST -I. MuCapUtilities/src/mecoSpectrum.cc
 #ifdef BUILD_TEST
 #include <iostream>

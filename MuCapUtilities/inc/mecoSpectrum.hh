@@ -9,6 +9,8 @@
 #ifndef MuCapUtilities_inc_mecoSpectrum_hh
 #define MuCapUtilities_inc_mecoSpectrum_hh
 
+#include <ostream>
+
 namespace mucap {
   struct MECOPars {
     double A; // normalization
@@ -17,6 +19,8 @@ namespace mucap {
     double T0;
     MECOPars() : A(), Tth(), alpha(), T0() {}
   };
+
+  std::ostream& operator<<(std::ostream& os, const MECOPars& p);
 
   double mecoSpectrum(double ek, const MECOPars& pars);
 
