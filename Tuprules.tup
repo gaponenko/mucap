@@ -1,6 +1,7 @@
-CFLAGS += -fno-omit-frame-pointer -rdynamic -fPIC
+CFLAGS += -g
 CFLAGS += -Wall
-CFLAGS += -O
+CFLAGS += -fmessage-length=0
+CFLAGS += -I$(TUP_CWD)
 CFLAGS += -I`root-config --incdir`
 
 LDFLAGS += `root-config --libs`
@@ -17,10 +18,55 @@ export FHICLCPP_LIB
 export ROOTSYS
 export LD_LIBRARY_PATH
 
-!cc = |> g++ $(CFLAGS) -I$FHICLCPP_INC -I$CPP0X_INC -I$CETLIB_INC -I$BOOST_INC -c %f -o %o |> %B.o
+TOPDIR = $(TUP_CWD)
+
+LIBUTIL=$(TOPDIR)/MuCapUtilities/libMuCapUtilities.a
+
+#================================================================
+ifndef STANDALONE_BUILD
+
+CFLAGS += -fno-omit-frame-pointer -rdynamic -fPIC
+
+LDFLAGS += -L$(TUP_CWD)/lib
+LDFLAGS += -lCintex
+
+export ART_INC
+export ART_LIB
+
+!cc = |> g++ $(CFLAGS) \
+    -I$ART_INC \
+    -I$FHICLCPP_INC \
+    -I$CPP0X_INC \
+    -I$CETLIB_INC \
+    -I$BOOST_INC \
+    -c %f -o %o |> %B.o
+
 !ldmain = |> g++ $(LDFLAGS) \
-	-L$FHICLCPP_LIB -lfhiclcpp \
+         -L$ART_LIB -lart_Framework_IO_Root \
+         -L$FHICLCPP_LIB -lfhiclcpp \
 	 -L$CPP0X_LIB \
 	 -L$CETLIB_LIB -lcetlib \
 	 -L$BOOST_LIB \
 	%f -o %o |>
+
+#================================================================
+# standalone: no ART dependencies
+else
+
+!cc = |> g++ $(CFLAGS) \
+    -I$FHICLCPP_INC \
+    -I$CPP0X_INC \
+    -I$CETLIB_INC \
+    -I$BOOST_INC \
+    -c %f -o %o |> %B.o
+
+!ldmain = |> g++ %f -o %o \
+	$(LDFLAGS) \
+         -L$FHICLCPP_LIB -Wl,-rpath=$FHICLCPP_LIB -lfhiclcpp \
+	 -L$CPP0X_LIB \
+	 -L$CETLIB_LIB -Wl,-rpath=$CETLIB_LIB -lcetlib  \
+	 -L$BOOST_LIB -Wl,-rpath=$BOOST_LIB -lboost_filesystem -lboost_regex -l boost_system \
+	 |>
+
+endif
+#================================================================

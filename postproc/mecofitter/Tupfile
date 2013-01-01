@@ -1,5 +1,7 @@
 include_rules
 
+LDFLAGS += $(LIBUTIL)
+
 : foreach *.cc |> !cc |> {objs}
 
-: {objs} |> !ldmain |> mecofitter
+: {objs}  $(LIBUTIL) |> !ldmain |> mecofitter
