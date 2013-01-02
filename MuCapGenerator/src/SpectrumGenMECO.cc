@@ -25,7 +25,7 @@ namespace mucap {
 
       // The exponential part of the spectrum is generated analytically (via CLHEP)
       // then accept/reject is done on the remaining factor.
-      const double ek = pars_.Tth + exp_.fire(pars_.T0);
+      const double ek = pars_.Tth + exp_.fire(1./pars_.T0inv);
 
       const double factor = std::pow(1 - pars_.Tth/ek, pars_.alpha);
       const double r = flat_.fire();

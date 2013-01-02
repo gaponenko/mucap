@@ -4,6 +4,9 @@
 //
 // A = 0.105/MeV, Tth=1.4 MeV, alpha=1.3279, T0=3.1 MeV
 //
+// We use T0inv == 1/T0 instead of the T0 parameter as this is
+// more convenient for making the fit.
+//
 // Andrei Gaponenko, 2012
 
 #ifndef MuCapUtilities_inc_mecoSpectrum_hh
@@ -16,8 +19,8 @@ namespace mucap {
     double A; // normalization
     double Tth; // threshold
     double alpha;
-    double T0;
-    MECOPars() : A(), Tth(), alpha(), T0() {}
+    double T0inv;
+    MECOPars() : A(), Tth(), alpha(), T0inv() {}
   };
 
   std::ostream& operator<<(std::ostream& os, const MECOPars& p);

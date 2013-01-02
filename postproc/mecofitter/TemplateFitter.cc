@@ -40,8 +40,8 @@ namespace mucap {
       fg.Tth = 1.4;
       fg.alpha = 1.33;
       // We fit spectrum with T0=3.1 using MC data with T0=3.5
-      // 3.1*3.5/(3.5-3.1) = 27.125
-      fg.T0 = 27.125;
+      // 1/T0 = 1/3.1 - 1./3.5 = .0369
+      fg.T0inv = 0.0369;
 
       //----------------
       // Determine the initial normalization:
@@ -62,7 +62,7 @@ namespace mucap {
       min_->SetVariable(0, "A",     fg.A,     0.1);
       min_->SetVariable(1, "Tth",   fg.Tth,   0.1);
       min_->SetVariable(2, "alpha", fg.alpha, 0.1);
-      min_->SetVariable(3, "T0",    fg.T0,    0.1*fg.T0);
+      min_->SetVariable(3, "T0inv",    fg.T0inv,    0.1*fg.T0inv);
 
       min_->SetMaxFunctionCalls(1000000);
       min_->SetMaxIterations(100000);

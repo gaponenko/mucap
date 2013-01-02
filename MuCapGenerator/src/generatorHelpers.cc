@@ -80,7 +80,7 @@ namespace mucap {
       pars.A = 1;
       pars.Tth = pset.get<double>("Tth");
       pars.alpha = pset.get<double>("alpha");
-      pars.T0 = pset.get<double>("T0");
+      pars.T0inv = 1./pset.get<double>("T0");
 
       return std::auto_ptr<ISpectrumGenerator>
         (new SpectrumGenMECO(pars, eng, pset.get<unsigned>("maxIter", 1000)));
