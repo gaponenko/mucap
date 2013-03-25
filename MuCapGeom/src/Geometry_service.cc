@@ -1,6 +1,5 @@
 #include "MuCapGeom/inc/Geometry.hh"
 
-#include "art/Framework/Services/Registry/ServiceMacros.h"
 
 #include <string>
 #include <vector>

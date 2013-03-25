@@ -5,6 +5,7 @@
 
 #include "fhiclcpp/ParameterSet.h"
 #include "art/Framework/Services/Registry/ActivityRegistry.h"
+#include "art/Framework/Services/Registry/ServiceMacros.h"
 
 #include "CLHEP/Vector/ThreeVector.h"
 
@@ -27,4 +28,5 @@ namespace mucap {
   };
 }
 
+DECLARE_ART_SERVICE(mucap::Geometry, LEGACY)
 #endif/*MuCapGeom_inc_Geometry_hh*/
