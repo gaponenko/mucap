@@ -126,7 +126,7 @@ namespace mucap {
                                   time_->generate()
                                   ));
 
-    event.put(output);
+    event.put(std::move(output));
   }
 
 } // namespace mucap

@@ -245,7 +245,7 @@ namespace mucap {
     // The framework rules requires we make a copy and add the copy.
     const PhysicalVolumeInfoCollection& vinfo = _physVolHelper.persistentInfo();
     auto_ptr<PhysicalVolumeInfoCollection> volumes(new PhysicalVolumeInfoCollection(vinfo));
-    run.put(volumes);
+    run.put(std::move(volumes));
 
     // Some of the user actions have beginRun methods.
     const CLHEP::Hep3Vector muCapOriginInWorld(0,0,0);
@@ -389,13 +389,13 @@ namespace mucap {
     _trackingAction->endEvent(*simParticles);
 
     // Add data products to the event.
-    // event.put(g4stat);
-    event.put(simParticles);
-    event.put(tvdHits, _tvdOutputName.name());
-    event.put(steppingPoints, _steppingPointsOutputName.name());
-    event.put(muCapChamberHits, MuCapSD::name());
+    // event.put(std::move(g4stat));
+    event.put(std::move(simParticles));
+    event.put(std::move(tvdHits), _tvdOutputName.name());
+    event.put(std::move(steppingPoints), _steppingPointsOutputName.name());
+    event.put(std::move(muCapChamberHits), MuCapSD::name());
 
-    //  event.put(pointTrajectories);
+    //  event.put(std::move(pointTrajectories));
 
     // Pause to see graphics.
     if ( !_visMacro.empty() ){
