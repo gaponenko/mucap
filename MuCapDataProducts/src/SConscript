@@ -8,47 +8,17 @@
 # Original author Rob Kutschke.
 #
 
-import os, re
+import os
 Import('env')
+Import('mu2e_helper')
 
-plugin_cc = Glob('*_module.cc', strings=True) + Glob('*_service.cc', strings=True) + Glob('*_source.cc', strings=True)
-non_plugin_cc = Glob('*.cc', strings=True)
-for cc in plugin_cc: non_plugin_cc.remove(cc)
+helper=mu2e_helper();
 
-# Construct library name using its path relative to the top 
-# of the source tree (usually "Offline")
-if os.environ.has_key('MU2E_TEST_RELEASE'):
-    srcTop = os.environ['MU2E_TEST_RELEASE']
-else:
-    if os.environ.has_key('MU2E_BASE_RELEASE'):
-        srcTop = os.environ['MU2E_BASE_RELEASE']
-    else:
-        raise Exception("Can not identify top source directory: neither MU2E_TEST_RELEASE nor MU2E_BASE_RELEASE is set")
-    pass
-#
-local_lib_path = re.sub('^'+srcTop+r'/(.*)/src$', r'\1', env.Dir('.').abspath)
-if re.match(r'^/', local_lib_path):
-    raise Exception('Error constructing relative library path: got "'+local_lib_path+'"')
-#
-local_lib_name=re.sub(r'/', r'_', local_lib_path)
+mainlib = helper.make_mainlib ( [ 'art_Framework_Core', 'CLHEP'] )
 
-my_libs=[ 
-    'Mu2eInterfaces',
-    'Mu2eUtilities',
-    'CLHEP'
-    ]
+helper.make_plugins( [ mainlib, ] )
 
-if non_plugin_cc:
-    env.SharedLibrary('#/lib/'+local_lib_name, non_plugin_cc,
-                      LIBS=[ my_libs ],
-                      )
-    my_libs += [local_lib_name]
-    pass
-
-for cc in plugin_cc:
-    libname='#/lib/'+local_lib_name+'_'+cc[:cc.find('.cc')]
-    env.SharedLibrary( libname, cc, LIBS=[ my_libs ] )
-
+helper.make_dict_and_map( [ mainlib, 'art_Framework_Core', 'CLHEP', ] )
 
 # This tells emacs to view this file in python mode.
 # Local Variables:
