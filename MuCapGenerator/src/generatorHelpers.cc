@@ -30,14 +30,14 @@
 namespace mucap {
 
   //================================================================
-  std::auto_ptr<IPositionGenerator>
+  std::unique_ptr<IPositionGenerator>
   makePositionGenerator(const fhicl::ParameterSet& pset, art::RandomNumberGenerator::base_engine_t& eng) {
 
     const std::string shape(pset.get<std::string>("shape"));
 
     //----------------------------------------------------------------
     if(shape == "cylinder") {
-      return std::auto_ptr<IPositionGenerator>
+      return std::unique_ptr<IPositionGenerator>
         (new PosGenCylinder(pset.get<CLHEP::Hep3Vector>("position"),
                             pset.get<double>("radius"),
                             pset.get<double>("halfdz"),
@@ -48,7 +48,7 @@ namespace mucap {
 
       art::ServiceHandle<Geometry> geom;
 
-      return std::auto_ptr<IPositionGenerator>
+      return std::unique_ptr<IPositionGenerator>
         (new PosGenCylinder(geom->targetCenter(),
                             pset.get<double>("radius"),
                             0.5*geom->targetThickness(),
@@ -61,14 +61,14 @@ namespace mucap {
   } // makePositionGenerator()
 
   //================================================================
-  std::auto_ptr<ISpectrumGenerator>
+  std::unique_ptr<ISpectrumGenerator>
   makeSpectrumGenerator(const fhicl::ParameterSet& pset, art::RandomNumberGenerator::base_engine_t& eng) {
 
     const std::string spectrum(pset.get<std::string>("spectrum"));
 
     //----------------------------------------------------------------
     if(spectrum == "flat") {
-      return std::auto_ptr<ISpectrumGenerator>
+      return std::unique_ptr<ISpectrumGenerator>
         (new SpectrumGenFlat(pset.get<double>("center"),
                              pset.get<double>("halfWidth"),
                              eng));
@@ -82,12 +82,12 @@ namespace mucap {
       pars.alpha = pset.get<double>("alpha");
       pars.T0inv = 1./pset.get<double>("T0");
 
-      return std::auto_ptr<ISpectrumGenerator>
+      return std::unique_ptr<ISpectrumGenerator>
         (new SpectrumGenMECO(pars, eng, pset.get<unsigned>("maxIter", 1000)));
     }
     //----------------------------------------------------------------
     else if(spectrum == "exp") {
-      return std::auto_ptr<ISpectrumGenerator>
+      return std::unique_ptr<ISpectrumGenerator>
         (new SpectrumGenExp(pset.get<double>("scale"),
                             pset.get<double>("min", 0),
                             pset.get<double>("max", std::numeric_limits<double>::max()),
@@ -99,9 +99,9 @@ namespace mucap {
   } // makeSpectrumGenerator()
 
   //================================================================
-  std::auto_ptr<IAngleGenerator>
+  std::unique_ptr<IAngleGenerator>
   makeAngleGenerator(const fhicl::ParameterSet& pset, art::RandomNumberGenerator::base_engine_t& eng) {
-    return std::auto_ptr<IAngleGenerator>
+    return std::unique_ptr<IAngleGenerator>
       (new AngleGenUniform(mu2e::RandomUnitSphereParams(pset.get<double>("czmin"),
                                                         pset.get<double>("czmax"),
                                                         pset.get<double>("phimin", 0.),

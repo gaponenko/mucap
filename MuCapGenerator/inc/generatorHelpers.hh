@@ -14,21 +14,21 @@ namespace mucap {
   //================================================================
   class IPositionGenerator;
 
-  std::auto_ptr<IPositionGenerator>
+  std::unique_ptr<IPositionGenerator>
   makePositionGenerator(const fhicl::ParameterSet& pset,
                         art::RandomNumberGenerator::base_engine_t& eng);
 
   //================================================================
   class ISpectrumGenerator;
 
-  std::auto_ptr<ISpectrumGenerator>
+  std::unique_ptr<ISpectrumGenerator>
   makeSpectrumGenerator(const fhicl::ParameterSet& pset,
                         art::RandomNumberGenerator::base_engine_t& eng);
 
   //================================================================
   class IAngleGenerator;
 
-  std::auto_ptr<IAngleGenerator>
+  std::unique_ptr<IAngleGenerator>
   makeAngleGenerator(const fhicl::ParameterSet& pset,
                         art::RandomNumberGenerator::base_engine_t& eng);
 

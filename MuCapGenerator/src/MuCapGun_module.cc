@@ -52,10 +52,10 @@ namespace mucap {
     PDGCode::type pdgId_;
     double mass_;
 
-    std::auto_ptr<IPositionGenerator> pos_;
-    std::auto_ptr<ISpectrumGenerator> ek_;
-    std::auto_ptr<IAngleGenerator> omega_;
-    std::auto_ptr<ISpectrumGenerator> time_;
+    std::unique_ptr<IPositionGenerator> pos_;
+    std::unique_ptr<ISpectrumGenerator> ek_;
+    std::unique_ptr<IAngleGenerator> omega_;
+    std::unique_ptr<ISpectrumGenerator> time_;
 
     TH1* hek_;
     TH1* hmomentum_;
@@ -106,7 +106,7 @@ namespace mucap {
   }
 
   void MuCapGun::produce(art::Event& event) {
-    std::auto_ptr<GenParticleCollection> output(new GenParticleCollection);
+    std::unique_ptr<GenParticleCollection> output(new GenParticleCollection);
 
     const double ek = ek_->generate();
     if(hek_) { hek_->Fill(ek); }

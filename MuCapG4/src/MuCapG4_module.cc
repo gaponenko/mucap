@@ -106,7 +106,7 @@ namespace mucap {
     virtual void endRun(art::Run &);
 
   private:
-    auto_ptr<Mu2eG4RunManager> _runManager;
+    unique_ptr<Mu2eG4RunManager> _runManager;
 
     fhicl::ParameterSet _materialPars;
 
@@ -123,7 +123,7 @@ namespace mucap {
 
     G4UIsession  *_session;
     G4UImanager  *_UI;
-    std::auto_ptr<G4VisManager> _visManager;
+    std::unique_ptr<G4VisManager> _visManager;
     int _rmvlevel;
     int _tmvlevel;
     int _checkFieldMap;
@@ -211,7 +211,7 @@ namespace mucap {
 
   // Create an instance of the run manager.
   void MuCapG4::beginJob(){
-    _runManager = auto_ptr<Mu2eG4RunManager>(new Mu2eG4RunManager);
+    _runManager = unique_ptr<Mu2eG4RunManager>(new Mu2eG4RunManager);
   }
 
   void MuCapG4::beginRun( art::Run &run){
@@ -244,7 +244,7 @@ namespace mucap {
     // Add info about the G4 volumes to the run-data.
     // The framework rules requires we make a copy and add the copy.
     const PhysicalVolumeInfoCollection& vinfo = _physVolHelper.persistentInfo();
-    auto_ptr<PhysicalVolumeInfoCollection> volumes(new PhysicalVolumeInfoCollection(vinfo));
+    unique_ptr<PhysicalVolumeInfoCollection> volumes(new PhysicalVolumeInfoCollection(vinfo));
     run.put(std::move(volumes));
 
     // Some of the user actions have beginRun methods.
@@ -287,8 +287,8 @@ namespace mucap {
 
     art::ServiceHandle<mucap::Geometry> gmucap;
     _runManager->SetUserInitialization(new WorldMaker<MuCapWorld, MuCapMaterials>
-                                       (std::auto_ptr<MuCapWorld>(new MuCapWorld(*gmucap)),
-                                        std::auto_ptr<MuCapMaterials>(new MuCapMaterials(_materialPars)))
+                                       (std::unique_ptr<MuCapWorld>(new MuCapWorld(*gmucap)),
+                                        std::unique_ptr<MuCapMaterials>(new MuCapMaterials(_materialPars)))
                                        );
 
     G4VUserPhysicsList* pL = physicsListDecider(config);
@@ -332,7 +332,7 @@ namespace mucap {
     // Setup the graphics if requested.
     if ( !_visMacro.empty() ) {
 
-      _visManager = std::auto_ptr<G4VisManager>(new G4VisExecutive);
+      _visManager = std::unique_ptr<G4VisManager>(new G4VisExecutive);
       _visManager->Initialize();
 
       ConfigFileLookupPolicy visPath;
@@ -358,15 +358,15 @@ namespace mucap {
     event.getByLabel(_generatorModuleLabel, gensHandle);
 
     // Create empty data products.
-    auto_ptr<SimParticleCollection>   simParticles(new SimParticleCollection);
+    unique_ptr<SimParticleCollection>   simParticles(new SimParticleCollection);
 
-    auto_ptr<StepPointMCCollection> steppingPoints(new StepPointMCCollection);
+    unique_ptr<StepPointMCCollection> steppingPoints(new StepPointMCCollection);
 
-    auto_ptr<StepPointMCCollection>        tvdHits(new StepPointMCCollection);
+    unique_ptr<StepPointMCCollection>        tvdHits(new StepPointMCCollection);
 
-    //    auto_ptr<PointTrajectoryCollection> pointTrajectories( new PointTrajectoryCollection);
+    //    unique_ptr<PointTrajectoryCollection> pointTrajectories( new PointTrajectoryCollection);
 
-    auto_ptr<StepPointMCCollection> muCapChamberHits(new StepPointMCCollection);
+    unique_ptr<StepPointMCCollection> muCapChamberHits(new StepPointMCCollection);
 
     // ProductID for the SimParticleCollection.
     art::ProductID simPartId(getProductID<SimParticleCollection>(event));

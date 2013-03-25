@@ -22,11 +22,11 @@ namespace mucap {
     class TemplateFitter {
       fhicl::ParameterSet pset_;
 
-      std::auto_ptr<const TH2> origData_;
-      std::auto_ptr<const TH3> origMC_;
+      std::unique_ptr<const TH2> origData_;
+      std::unique_ptr<const TH3> origMC_;
       FitRegion region_;
       TargetFunctionMECO func_;
-      std::auto_ptr<ROOT::Math::Minimizer> min_;
+      std::unique_ptr<ROOT::Math::Minimizer> min_;
 
       TH2 *visualizeFitRegion(const TH2 *binningTemplate, const FitRegion &r) const;
       TH2 *visualizeFitData(const std::string& hname,
