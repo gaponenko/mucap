@@ -1,3 +1,5 @@
+// This class does not have to be persisted because it can be easily re-created from StepPointMC.
+//
 // Andrei Gaponenko, 2012
 
 #ifndef MuCapDataProducts_inc_MuCapSimHit_hh

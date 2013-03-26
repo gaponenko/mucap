@@ -1,3 +1,6 @@
+// Cells correspond to drift volumes assuming the wires.
+// Several cells may be read out on the same channel - see WireReadoutId.
+//
 // Andrei Gaponenko, 2012
 
 #ifndef MuCapDataProducts_inc_WireCellId_hh

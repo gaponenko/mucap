@@ -1,0 +1,6 @@
+<lcgdict>
+ <class name="mucap::WireReadoutId"/>
+ <class name="mucap::MuCapRecoHit"/>
+ <class name="mucap::MuCapRecoHitCollection"/>
+ <class name="art::Wrapper<mucap::MuCapRecoHitCollection>"/>
+</lcgdict>
