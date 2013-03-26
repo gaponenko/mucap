@@ -1,0 +1,40 @@
+// Andrei Gaponenko, 2013
+
+#include "minimalMessageService.fcl"
+#include "standardProducers.fcl"
+#include "standardServices.fcl"
+
+#include "MuCapG4/test/detectorDefs.fcl"
+
+// Give this job a name.
+process_name : test
+
+source : { module_type : RootInput }
+
+services : {
+    message : @local::default_message
+    scheduler: { defaultExceptions : false }
+    TFileService : { fileName : "clarktree.root" }
+    user : {
+        Geometry : @local::mucapGeometry
+    }
+}
+
+physics : {
+    analyzers : {
+        clarkdumper : {
+            module_type : ClarkTreeDumper
+            hitsModuleLabel : "g4run"
+            hitsInstanceName : "MuCapSimHits"
+            particlesModuleLabel : "g4run"
+        }
+    }
+
+    diagnostic: [clarkdumper]
+    end_paths : [diagnostic]
+}
+
+// This tells emacs to view this file in the JavaScript mode.
+// Local Variables:
+// mode:js
+// End:
