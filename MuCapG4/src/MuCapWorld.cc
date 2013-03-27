@@ -142,7 +142,7 @@ namespace mucap {
 
     //----------------------------------------------------------------
     vector<ParameterSet> modulePars(geom_->pset().get<vector<ParameterSet> >("chamberModules"));
-    for(unsigned i = 0, wpoff=0; i < modulePars.size(); ++i) {
+    for(unsigned i = 0, wpoff=1; i < modulePars.size(); ++i) {
       wpoff += constructChamberModule(i, wpoff, modulePars[i], worldVInfo);
     }
 
