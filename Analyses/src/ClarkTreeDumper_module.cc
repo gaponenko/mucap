@@ -3,17 +3,12 @@
 #include "cetlib/exception.h"
 
 // Mu2e includes.
-#include "MCDataProducts/inc/StepPointMC.hh"
-#include "MCDataProducts/inc/StepPointMCCollection.hh"
-#include "MCDataProducts/inc/SimParticle.hh"
-#include "MCDataProducts/inc/SimParticleCollection.hh"
-#include "MCDataProducts/inc/StepPointMC.hh"
-#include "MCDataProducts/inc/StepPointMCCollection.hh"
 #include "MuCapDataProducts/inc/WirePlaneId.hh"
-#include "MuCapDataProducts/inc/WireCellId.hh"
-#include "MuCapDataProducts/inc/MuCapSimHit.hh"
+#include "MuCapDataProducts/inc/WireReadoutId.hh"
+#include "MuCapDataProducts/inc/MuCapRecoHit.hh"
+#include "MuCapDataProducts/inc/MuCapRecoHitCollection.hh"
 
-#include "GeometryService/inc/GeomHandle.hh"
+#include "MuCapGeom/inc/Geometry.hh"
 
 // art includes.
 #include "fhiclcpp/ParameterSet.h"
@@ -49,21 +44,19 @@
 
 namespace mucap {
 
-  const int MAX_PLANES_D = 44;
-  const int MAX_WIRES_D = 80;
-  const int MAX_PLANES_P = 12;
-  const int MAX_WIRES_P = 160;
-  const int MAXHITS_DC = MAX_WIRES_D * MAX_PLANES_D * 2; // dc_mngw
-  const int MAXHITS_PC = MAX_WIRES_P * MAX_PLANES_P * 2; // pc_mngw
+  const unsigned MAX_PLANES_D = 44;
+  const unsigned MAX_WIRES_D = 80;
+  const unsigned MAX_PLANES_P = 12;
+  const unsigned MAX_WIRES_P = 160;
+  const unsigned MAXHITS_DC = MAX_WIRES_D * MAX_PLANES_D * 2; // dc_mngw
+  const unsigned MAXHITS_PC = MAX_WIRES_P * MAX_PLANES_P * 2; // pc_mngw
 
   // Why do DetectorGeo.h defs disagree with MOFIA's det_geom_mod.f90??? Use here constants from the latter source.
-  const int AG_MAXM_SCINTS = 8;
-  const int AG_MAXT_SCINTS = 8;
-  const int AG_MAXO_SCINTS = 64;
-  const int AG_MAX_SCINTS = AG_MAXM_SCINTS + AG_MAXT_SCINTS + AG_MAXO_SCINTS;
-  const int MAXHITS_SC = AG_MAX_SCINTS * 8; // sc_mngw
-
-  using mu2e::StepPointMCCollection;
+  const unsigned AG_MAXM_SCINTS = 8;
+  const unsigned AG_MAXT_SCINTS = 8;
+  const unsigned AG_MAXO_SCINTS = 64;
+  const unsigned AG_MAX_SCINTS = AG_MAXM_SCINTS + AG_MAXT_SCINTS + AG_MAXO_SCINTS;
+  const unsigned MAXHITS_SC = AG_MAX_SCINTS * 8; // sc_mngw
 
   //================================================================
   // EVID branch
@@ -108,10 +101,8 @@ namespace mucap {
   //================================================================
   class ClarkTreeDumper : public art::EDAnalyzer {
     fhicl::ParameterSet pset_;
-    std::string hitsModuleLabel_;
-    std::string hitsInstanceName_;
-    std::string particlesModuleLabel_;
-    std::string particlesInstanceName_;
+    std::string digiModuleLabel_;
+    art::ServiceHandle<Geometry> geom_;
 
     // Tree branch variables
 
@@ -144,17 +135,14 @@ namespace mucap {
 
   public:
     explicit ClarkTreeDumper(const fhicl::ParameterSet& pset);
-    virtual void beginJob();
-    virtual void analyze(const art::Event& event);
+    virtual void beginJob() override;
+    virtual void analyze(const art::Event& event) override;
   };
 
   //================================================================
   ClarkTreeDumper::ClarkTreeDumper(const fhicl::ParameterSet& pset)
     : pset_(pset)
-    , hitsModuleLabel_(pset.get<std::string>("hitsModuleLabel"))
-    , hitsInstanceName_(pset.get<std::string>("hitsInstanceName", ""))
-    , particlesModuleLabel_(pset.get<std::string>("particlesModuleLabel"))
-    , particlesInstanceName_(pset.get<std::string>("particlesInstanceName", ""))
+    , digiModuleLabel_(pset.get<std::string>("digiModuleLabel"))
     , dc_nhits_(0)
     , pc_nhits_(0)
     , sc_nhits_(0)
@@ -197,6 +185,42 @@ namespace mucap {
     // We store subRun, and drop the run number.
     evid_.nrun = event.subRun();
     evid_.nevt = event.event();
+
+    //----------------------------------------------------------------
+    art::Handle<MuCapRecoHitCollection> hdchits;
+    event.getByLabel(digiModuleLabel_, "dchits", hdchits);
+    const MuCapRecoHitCollection& dchits(*hdchits);
+    if(dchits.size() > MAXHITS_DC) {
+      throw cet::exception("OVERFLOW") << "ClarkTreeDumper: too many DC hits\n";
+    }
+
+    dc_nhits_ = dchits.size();
+    for(unsigned i=0; i<dchits.size(); ++i) {
+      dc_time_[i] = dchits[i].time();
+      dc_width_[i] = dchits[i].width();
+      const WireReadoutId rid = dchits[i].rid();
+      dc_plane_[i] = geom_->wpByGlobalNumber(rid.plane().number()).localPlane;
+      dc_cell_[i] = rid.channel();
+    }
+
+    //----------------------------------------------------------------
+    art::Handle<MuCapRecoHitCollection> hpchits;
+    event.getByLabel(digiModuleLabel_, "pchits", hpchits);
+    const MuCapRecoHitCollection& pchits(*hpchits);
+    if(pchits.size() > MAXHITS_PC) {
+      throw cet::exception("OVERFLOW") << "ClarkTreeDumper: too many PC hits\n";
+    }
+
+    pc_nhits_ = pchits.size();
+    for(unsigned i=0; i<pchits.size(); ++i) {
+      pc_time_[i] = pchits[i].time();
+      pc_width_[i] = pchits[i].width();
+      const WireReadoutId rid = pchits[i].rid();
+      pc_plane_[i] = geom_->wpByGlobalNumber(rid.plane().number()).localPlane;
+      pc_cell_[i] = rid.channel();
+    }
+
+    //----------------------------------------------------------------
     nt_->Fill();
   }
 

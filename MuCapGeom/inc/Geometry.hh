@@ -13,7 +13,7 @@
 namespace mucap {
 
   enum class WPType { PC, DC };
-  struct WPInfo { WPType wpt; unsigned int iplane; };
+  struct WPInfo { WPType wpt; unsigned int localPlane; };
 
   class Geometry {
   public:

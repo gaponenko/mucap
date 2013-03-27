@@ -24,9 +24,7 @@ physics : {
     analyzers : {
         clarkdumper : {
             module_type : ClarkTreeDumper
-            hitsModuleLabel : "g4run"
-            hitsInstanceName : "MuCapSimHits"
-            particlesModuleLabel : "g4run"
+            digiModuleLabel : "digitization"
         }
     }
 
