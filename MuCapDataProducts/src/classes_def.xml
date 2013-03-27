@@ -1,4 +1,5 @@
 <lcgdict>
+ <class name="mucap::WirePlaneId"/>
  <class name="mucap::WireReadoutId"/>
  <class name="mucap::MuCapRecoHit"/>
  <class name="mucap::MuCapRecoHitCollection"/>

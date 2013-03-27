@@ -1,3 +1,4 @@
+#include "MuCapDataProducts/inc/WirePlaneId.hh"
 #include "MuCapDataProducts/inc/WireReadoutId.hh"
 #include "MuCapDataProducts/inc/MuCapRecoHit.hh"
 #include "MuCapDataProducts/inc/MuCapRecoHitCollection.hh"
