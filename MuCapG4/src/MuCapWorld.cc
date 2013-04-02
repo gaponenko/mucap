@@ -379,6 +379,7 @@ namespace mucap {
                                        )
     {
       const unsigned ncells = detail.get<unsigned>("nwires");
+      const unsigned wireNumberOffset = detail.get<unsigned>("wireNumberOffset", 0);
       const double dx = detail.get<double>("wireSpacing");
 
       const double chamberRadius = geom_->pset().get<ParameterSet>("cathode").get<double>("radius");
@@ -412,7 +413,7 @@ namespace mucap {
        const CLHEP::Hep3Vector
          cellCenterInParent(rot->inverse()*CLHEP::Hep3Vector(0.5*(xmax+xmin), 0, 0.5*(driftZmax + driftZmin)));
 
-       const WireCellId cid(WirePlaneId(globalPlaneNumber), icell);
+       const WireCellId cid(WirePlaneId(globalPlaneNumber), icell + wireNumberOffset + 1);
 
         ostringstream osname;
         osname<<"driftPlane_"<<std::setw(2)<<std::setfill('0')<<globalPlaneNumber<<"_"<<icell;

@@ -74,6 +74,7 @@ mucapGeometry : {
     targetModule : {
         material : "MUCAP_PC_GAS"
         nwires : 48
+	wireNumberOffset : 56
         wireSpacing : 2 // mm
         wire : {
             material : "G4_W"
