@@ -178,7 +178,7 @@ namespace mucap {
     _physVolHelper(),
     _processInfo(),
     _printPhysicsProcessSummary(false),
-    _sensitiveDetectorHelper(pset),
+    _sensitiveDetectorHelper(pset.get<fhicl::ParameterSet>("SDConfig", fhicl::ParameterSet())),
     _muCapSD(),
     _tvdOutputName(StepInstanceName::timeVD),
     _steppingPointsOutputName(StepInstanceName::stepper)
