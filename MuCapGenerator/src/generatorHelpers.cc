@@ -15,6 +15,7 @@
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 
 #include "GeneralUtilities/inc/ParameterSetHelpers.hh"
+#include "ConfigTools/inc/ConfigFileLookupPolicy.hh"
 
 #include "MuCapGeom/inc/Geometry.hh"
 
@@ -23,8 +24,10 @@
 #include "MuCapGenerator/inc/SpectrumGenFlat.hh"
 #include "MuCapGenerator/inc/SpectrumGenMECO.hh"
 #include "MuCapGenerator/inc/SpectrumGenExp.hh"
+#include "MuCapGenerator/inc/SpectrumGenTabulated.hh"
 
 #include "MuCapUtilities/inc/mecoSpectrum.hh"
+#include "MuCapUtilities/inc/TabulatedFunction.hh"
 
 
 namespace mucap {
@@ -92,6 +95,12 @@ namespace mucap {
                             pset.get<double>("min", 0),
                             pset.get<double>("max", std::numeric_limits<double>::max()),
                             eng));
+    }
+    //----------------------------------------------------------------
+    else if(spectrum == "tabulated") {
+      mu2e::ConfigFileLookupPolicy mu2eFileFinder;
+      TabulatedFunction func(mu2eFileFinder(pset.get<std::string>("tableFileName")));
+      return std::unique_ptr<ISpectrumGenerator>(new SpectrumGenTabulated(func, eng));
     }
     //----------------------------------------------------------------
     throw cet::exception("GEOM")<<__func__<<": unknown spectrum setting \""<<spectrum<<"\"\n";

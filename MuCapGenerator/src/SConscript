@@ -19,6 +19,8 @@ mylibs=[
     'art_Framework_Core',
     'art_Framework_Services_Optional_TFileService_service',
     'mu2e_MuCapDataProducts',
+    'mu2e_MuCapDataProducts',
+    'mu2e_MuCapUtilities',
     'mu2e_Mu2eInterfaces',
     'mu2e_Mu2eUtilities',
     'CLHEP'
