@@ -2,6 +2,7 @@
 #include "standardProducers.fcl"
 #include "standardServices.fcl"
 
+#include "MuCapG4/test/generatorDefs.fcl"
 #include "MuCapG4/test/detectorDefs.fcl"
 
 # Give this job a name.
@@ -16,7 +17,7 @@ source : {
 services : {
 
     message               : @local::default_message
-    TFileService          : { fileName : "hist_mucap.root" }
+    TFileService          : { fileName : nil }
     RandomNumberGenerator : { }
 
     user : {
@@ -34,52 +35,7 @@ physics : {
 
     producers:  {
 
-        generate: {
-            module_type : MuCapVtxKludge
-
-            pdgId : 2212
-
-            position : {
-                shape : targetCylinder
-                radius : 3 // mm
-            }
-
-            kineticEnergy : {
-                spectrum : MECO
-                Tth : 1.4 // MeV
-                alpha : 1.3279
-                T0 : 3.1 // MeV
-            }
-
-            angles : {
-                czmin : -1
-                czmax : +1
-            }
-
-            time : {
-                spectrum : exp
-                scale : 864. // ns
-                min : 0
-                max : 10000. // TDC gate end
-            }
-
-            kludgePdgId : -13 // mu+ (going backwards)
-            kludgeMomentum : { spectrum : flat center : 50 halfWidth : 0 }
-            kludgeAngles : { czmin : -1 czmax : -1 }
-
-            histograms : {
-                kineticEnergy : {
-                    xmin : 0
-                    xmax : 100
-                    nbins : 500
-                }
-                momentum : {
-                    xmin : 0
-                    xmax : 500
-                    nbins : 500
-                }
-            }
-        }
+        generate: @local::muCapVtxGenerator
 
         g4run: {
             module_type          : MuCapG4
@@ -130,7 +86,7 @@ outputs:  {
 
     outfile : {
         module_type   :   RootOutput
-        fileName      :   "data_mucap.root"
+        fileName      :   nil
     }
 
 }

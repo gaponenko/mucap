@@ -1,0 +1,70 @@
+// fhicl include file that defines detector geometry
+//
+// Andrei Gaponenko, 2012
+
+BEGIN_PROLOG
+
+//================================================================
+mecoSpectrum : {
+   spectrum : MECO
+   Tth : 1.4 // MeV
+   alpha : 1.3279
+   T0 : 3.1 // MeV
+}
+
+//================================================================
+dioSpectrum : {
+   spectrum : tabulated
+   tableFileName : "MuCapGenerator/data/muonDIOAlvsEk"
+}
+
+//================================================================
+muCapVtxGenerator : {
+   module_type : MuCapVtxKludge
+   
+   pdgId : nil
+   kineticEnergy : nil
+   
+   position : {
+       shape : targetCylinder
+       radius : 3 // mm
+   }
+   
+   angles : {
+       czmin : -1
+       czmax : +1
+   }
+   
+   time : {
+       spectrum : exp
+       scale : 864. // ns
+       min : 0
+       max : 10000. // TDC gate end
+   }
+   
+   kludgePdgId : -13 // mu+ (going backwards)
+   kludgeMomentum : { spectrum : flat center : 50 halfWidth : 0 }
+   kludgeAngles : { czmin : -1 czmax : -1 }
+   
+   histograms : {
+       kineticEnergy : {
+           xmin : 0
+           xmax : 100
+           nbins : 500
+       }
+       momentum : {
+           xmin : 0
+           xmax : 500
+           nbins : 500
+       }
+   }
+}
+
+//================================================================
+
+END_PROLOG
+
+// This tells emacs to view this file in the JavaScript mode.
+// Local Variables:
+// mode:js
+// End:

@@ -1,0 +1,13 @@
+#include "MuCapG4/test/mucap-common.fcl"
+
+physics.producers.generate.pdgId : 11
+physics.producers.generate.kineticEnergy : @local::dioSpectrum
+
+process_name : mucapDIO
+services.TFileService.fileName : "hist_mucapDIO.root"
+outputs.outfile.fileName       : "data_mucapDIO.root"
+
+// This tells emacs to view this file in the JavaScript mode.
+// Local Variables:
+// mode:js
+// End:
