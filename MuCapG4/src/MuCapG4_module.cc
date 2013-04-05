@@ -46,6 +46,7 @@
 #include "Mu2eG4/inc/MuonMinusConversionAtRest.hh"
 #include "ConfigTools/inc/ConfigFileLookupPolicy.hh"
 #include "SeedService/inc/SeedService.hh"
+#include "Mu2eUtilities/inc/SimParticleCollectionPrinter.hh"
 
 // Data products that will be produced by this module.
 #include "MCDataProducts/inc/StepPointMCCollection.hh"
@@ -140,6 +141,8 @@ namespace mucap {
     PhysicsProcessInfo _processInfo;
     bool _printPhysicsProcessSummary;
 
+    SimParticleCollectionPrinter _simParticlePrinter;
+
     SensitiveDetectorHelper _sensitiveDetectorHelper;
     MuCapSD *_muCapSD;
 
@@ -178,6 +181,7 @@ namespace mucap {
     _physVolHelper(),
     _processInfo(),
     _printPhysicsProcessSummary(false),
+    _simParticlePrinter(pset.get<fhicl::ParameterSet>("SimParticlePrinter", SimParticleCollectionPrinter::defaultPSet())),
     _sensitiveDetectorHelper(pset.get<fhicl::ParameterSet>("SDConfig", fhicl::ParameterSet())),
     _muCapSD(),
     _tvdOutputName(StepInstanceName::timeVD),
@@ -387,6 +391,8 @@ namespace mucap {
 
     // Run self consistency checks if enabled.
     _trackingAction->endEvent(*simParticles);
+
+    _simParticlePrinter.print(std::cout, *simParticles);
 
     // Add data products to the event.
     // event.put(std::move(g4stat));
