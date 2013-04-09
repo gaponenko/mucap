@@ -133,6 +133,125 @@ chamberModulesIdeal : [
 ]
 
 //================================================================
+// numbers from dt_geo.00061, converted to mm
+chamberModules00061 : [
+    {
+        type  : pcModule
+        zfoil : [ -599.7760, -595.7759, -591.7769, -587.7779, -583.7782 ]
+        zwire : [ -597.9256, -593.9262, -589.9275, -585.9282 ]
+        rotation : [ +45.0, -45.0, +45.0, -45.0 ]
+    },
+    {
+        type  : dcModule // dense stack
+        zfoil : [ -499.792, -495.792, -491.791, -487.790, -483.789, -479.789, -475.788, -471.787, -467.787 ]
+        zwire : [ -497.942, -493.941, -489.940, -485.940, -481.939, -477.938, -473.937, -469.937 ]
+        rotation : [  -45,    45,   -45,  45,  45,   -45,  45,   -45 ]
+    },
+    {
+        type  : dcModule
+        zfoil : [ -423.788, -419.788, -415.789 ]
+        zwire : [ -421.938, -417.939 ]
+        rotation : [ +45,  -45 ]
+    },
+    {
+        type  : dcModule
+        zfoil : [ -371.790, -367.791, -363.791]
+        zwire : [    -369.940, -365.941 ]
+        rotation : [ +45,  -45 ]
+    },
+    {
+        type  : dcModule
+        zfoil : [ -299.808, -295.809, -291.809 ]
+        zwire : [     -297.958, -293.959 ]
+        rotation : [ +45,  -45 ]
+    },
+    {
+        type  : dcModule
+        zfoil : [ -227.827, -223.828, -219.829 ]
+        zwire : [   -225.977,  -221.978  ]
+        rotation : [ +45,  -45 ]
+    },
+    {
+        type  : dcModule
+        zfoil : [ -155.848, -151.848, -147.849 ]
+        zwire : [    -153.998,  -149.998 ]
+        rotation : [ +45,  -45 ]
+    },
+    {
+        type  : dcModule
+        zfoil : [ -103.854,  -99.855, -95.856 ]
+        zwire : [    -102.004,  -98.005 ]
+        rotation : [ +45,  -45 ]
+    },
+    {
+        type  : dcModule
+        zfoil : [ -51.862,  -47.862,  -43.863 ]
+        zwire : [   -50.012,  -46.013 ]
+        rotation : [ +45,  -45 ]
+    },
+    {
+        type  : targetModule
+        zfoil : [ -8.1318,  -4.1318,   -0.0904,   3.8671,   7.8677 ]
+        zwire : [ -5.9817, -1.9816, 2.0167, 6.0172 ]
+        rotation : [ +135.0, -135.0, +135.0, -135.0 ]
+    },
+    {
+        type  : dcModule
+        zfoil : [ 43.866,   47.866,   51.865]
+        zwire : [   46.016, 50.015 ]
+        rotation : [ 135, -135 ]
+    },
+    {
+        type  : dcModule
+        zfoil : [ 95.862,   99.861,  103.860]
+        zwire : [   98.012,  102.011 ]
+        rotation : [ 135, -135 ]
+    },
+    {
+        type  : dcModule
+        zfoil : [ 147.844,  151.844,  155.843 ]
+        zwire : [   149.994, 153.994 ]
+        rotation : [135, -135 ]
+    },
+    {
+        type  : dcModule
+        zfoil : [ 219.828,  223.827,  227.826 ]
+        zwire : [  221.978,  225.977 ]
+        rotation : [ 135, -135 ]
+    },
+    {
+        type  : dcModule
+        zfoil : [ 291.810,  295.809,  299.809 ]
+        zwire : [  293.960,  297.959 ]
+        rotation : [135, -135]
+    },
+    {
+        type  : dcModule
+        zfoil : [ 363.794,  367.794,  371.794 ]
+        zwire : [   365.944,  369.944 ]
+        rotation : [135, -135]
+    },
+    {
+        type  : dcModule
+        zfoil : [ 415.792,  419.792,  423.791 ]
+        zwire : [    417.942,  421.941 ]
+        rotation : [135, -135]
+    },
+    {
+        type  : dcModule
+        zfoil : [ 467.791,  471.790,  475.790, 479.790,  483.789,  487.789,  491.789,  495.789,  499.788 ]
+        zwire : [     469.941, 473.940, 477.940, 481.939, 485.939, 489.939, 493.939, 497.939 ]
+        rotation : [135, -135, 135, -135, -135, 135, -135, 135]
+    },
+    {
+        type  : pcModule
+        zfoil : [ 583.7595,  587.7595,  591.7596,  595.7596,  599.7596 ]
+        zwire : [ 585.9095, 589.9096, 593.9096, 597.9096 ]
+        rotation : [ +135.0, -135.0, +135.0, -135.0 ]
+    }
+]
+
+//================================================================
 mucapGeometry : {
     forceAuxEdgeVisible : true
     doSurfaceCheck : false
@@ -153,7 +272,7 @@ mucapGeometry : {
 
     cathode : {
         radius : 169 // mm
-        thickness : 0.005872 // mm
+        thickness : 0.005960 // mm
         material : "G4_MYLAR"
         visible : false
         solid : false
@@ -229,7 +348,7 @@ mucapGeometry : {
         driftCellSolid : false
     }
 
-    chamberModules : @local::chamberModulesIdeal
+    chamberModules : @local::chamberModules00061
 
 } // end of geometry
 
