@@ -3,6 +3,10 @@
 physics.producers.generate.pdgId : 2212
 physics.producers.generate.kineticEnergy : @local::mecoSpectrum
 
+//g3cmp: // Art's G3 settings: p=100 MeV/c, cos(theta)=+0.85
+//g3cmp: physics.producers.generate.kineticEnergy : { spectrum: flat center: 5.31389751225095 halfWidth: 0}
+//g3cmp: physics.producers.generate.angles : { czmin : 0.85  czmax : 0.85 }
+
 process_name : mucapProtons
 services.TFileService.fileName : "hist_mucapProtons.root"
 outputs.outfile.fileName       : "data_mucapProtons.root"
