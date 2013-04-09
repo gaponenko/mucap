@@ -2,6 +2,10 @@
 
 physics.producers.generate.pdgId : 11
 physics.producers.generate.kineticEnergy : @local::dioSpectrum
+//debug: physics.producers.generate.kineticEnergy : { spectrum: flat center: 53 halfWidth: 0}
+//debug: physics.producers.generate.angles : { czmin : 0  czmax : +0.4 }
+//debug: physics.producers.g4run.visMacro :  "MuCapG4/test/vis_mucap.mac"
+//debug: physics.producers.g4run.SimParticlePrinter : {}
 
 process_name : mucapDIO
 services.TFileService.fileName : "hist_mucapDIO.root"
