@@ -3,7 +3,7 @@
 physics.producers.generate : {
    module_type : FromG3
    pdgId : 2212
-   inputFileName : "protons8.dat"
+   inputFileName : "protons9.dat"
 
    histograms : {
        kineticEnergy : {
@@ -22,9 +22,19 @@ physics.producers.generate : {
 //physics.producers.g4run.visMacro :  "MuCapG4/test/vis_mucap.mac"
 //physics.producers.g4run.SimParticlePrinter : {}
 
+physics.analyzers.g3g4cmpdumper : {
+   module_type: G3G4CmpDumper
+   g4ModuleLabel : "g4run"
+   g4InstanceName : ""
+   g3StopsModuleLabel : "generate"
+   g3StopsInstanceName : "G3ProtonStops"
+}
+
+physics.e1 : [mcparticles, mchits,g3g4cmpdumper]
+
 process_name : g3g4cmp
-services.TFileService.fileName : "hist_g3g4cmp.root"
-outputs.outfile.fileName       : "data_g3g4cmp.root"
+services.TFileService.fileName : "hist_protons9.root"
+//outputs.outfile.fileName       : "data_protons9.root"
 
 // This tells emacs to view this file in the JavaScript mode.
 // Local Variables:
