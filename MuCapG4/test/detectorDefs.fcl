@@ -191,7 +191,15 @@ chamberModules00061 : [
     },
     {
         type  : targetModule
-        zfoil : [ -8.1318,  -4.1318,   -0.0904,   3.8671,   7.8677 ]
+        zfoil : [ -8.1318,  -4.1318,
+                  // The value in dt_geo.00061: -0.0904,
+                  // however this is the 25um foil position, and
+                  // 71um target is glued on the "-z" side
+                  // (in G3's PC6 volume).
+                  // -0.0904 - 0.0250/2 - 0.071/2 = -0.1384
+                  -0.1384,
+                  3.8671,   7.8677 ]
+
         zwire : [ -5.9817, -1.9816, 2.0167, 6.0172 ]
         rotation : [ +135.0, -135.0, +135.0, -135.0 ]
     },
