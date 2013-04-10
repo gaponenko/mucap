@@ -27,26 +27,26 @@ namespace mucap {
   using mu2e::SimParticleCollection;
 
   //================================================================
-  class MuCapG3CmpDumper : public art::EDAnalyzer {
+  class MuCapG3CmpPrinter : public art::EDAnalyzer {
     std::string inModuleLabel_;
     std::string inInstanceName_;
     std::string outFileName_;
     std::ofstream of_;
   public:
-    explicit MuCapG3CmpDumper(const fhicl::ParameterSet& pset);
+    explicit MuCapG3CmpPrinter(const fhicl::ParameterSet& pset);
     virtual void beginJob() override;
     virtual void analyze(const art::Event& event) override;
   };
 
   //================================================================
-  MuCapG3CmpDumper::MuCapG3CmpDumper(const fhicl::ParameterSet& pset)
+  MuCapG3CmpPrinter::MuCapG3CmpPrinter(const fhicl::ParameterSet& pset)
     : inModuleLabel_(pset.get<std::string>("particlesModuleLabel"))
     , inInstanceName_(pset.get<std::string>("particlesInstanceName", ""))
     , outFileName_(pset.get<std::string>("outFileName"))
   {}
 
   //================================================================
-  void MuCapG3CmpDumper::beginJob() {
+  void MuCapG3CmpPrinter::beginJob() {
     //art::ServiceHandle<art::TFileService> tfs;
     of_.open(outFileName_.c_str());
     if(!of_.is_open()) {
@@ -55,7 +55,7 @@ namespace mucap {
   }
 
   //================================================================
-  void MuCapG3CmpDumper::analyze(const art::Event& event) {
+  void MuCapG3CmpPrinter::analyze(const art::Event& event) {
 
     art::Handle<SimParticleCollection> ih;
     event.getByLabel(inModuleLabel_, inInstanceName_, ih);
@@ -64,7 +64,7 @@ namespace mucap {
     cet::map_vector_key iprim(1);
     const SimParticle primary(coll.getOrThrow(iprim));
     if(primary.pdgId() != 2212) {
-      throw cet::exception("INPUTS")<<"MuCapG3CmpDumper: assumed primary is not a proton: pdgId = "<<primary.pdgId()<<"\n";
+      throw cet::exception("INPUTS")<<"MuCapG3CmpPrinter: assumed primary is not a proton: pdgId = "<<primary.pdgId()<<"\n";
     }
 
     //std::cout<<primary.startPosition()<<" sm="<<primary.startMomentum()<<", ep="<<primary.endPosition()<< ", em="<<primary.endMomentum()<<std::endl;
@@ -86,4 +86,4 @@ namespace mucap {
   //================================================================
 } // namespace mucap
 
-DEFINE_ART_MODULE(mucap::MuCapG3CmpDumper);
+DEFINE_ART_MODULE(mucap::MuCapG3CmpPrinter);

@@ -23,7 +23,7 @@ services : {
 physics : {
     analyzers : {
         dumper : {
-            module_type : MuCapG3CmpDumper
+            module_type : MuCapG3CmpPrinter
             particlesModuleLabel : "g4run"
             particlesInstanceName : ""
 	    outFileName : "protonsG4.dat"
