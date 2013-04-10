@@ -65,33 +65,33 @@ namespace mucap {
   //================================================================
   void MuCapSimHitsHist::beginJob() {
 
-      art::ServiceHandle<art::TFileService> tfs;
+    art::ServiceHandle<art::TFileService> tfs;
 
-      cellEDepTotal_ =  tfs->make<TH1D>("cellEDepTotal", "Cell energy deposition, total", 2000, 0., 2.);
-      cellEDepTotal_->GetXaxis()->SetTitle("Energy deposition [MeV]");
+    cellEDepTotal_ =  tfs->make<TH1D>("cellEDepTotal", "Cell energy deposition, total", 2000, 0., 2.);
+    cellEDepTotal_->GetXaxis()->SetTitle("Energy deposition [MeV]");
 
-      cellEDepIonizing_ =  tfs->make<TH1D>("cellEDepIonizing", "Cell energy deposition, ionizing", 2000, 0., 2.);
-      cellEDepIonizing_->GetXaxis()->SetTitle("Energy deposition [MeV]");
+    cellEDepIonizing_ =  tfs->make<TH1D>("cellEDepIonizing", "Cell energy deposition, ionizing", 2000, 0., 2.);
+    cellEDepIonizing_->GetXaxis()->SetTitle("Energy deposition [MeV]");
 
-      const int maxHitCells = 100;
-      numCellPlane2d_ =  tfs->make<TH2D>("numCellPlane2d", "Num hit planes vs num hit cells",
-                                         maxHitCells+1, -0.5, maxHitCells+0.5,
-                                         57, -0.5, 56.5);
+    const int maxHitCells = 100;
+    numCellPlane2d_ =  tfs->make<TH2D>("numCellPlane2d", "Num hit planes vs num hit cells",
+                                       maxHitCells+1, -0.5, maxHitCells+0.5,
+                                       57, -0.5, 56.5);
 
-      numCellPlane2d_->SetOption("colz");
+    numCellPlane2d_->SetOption("colz");
 
 
-      numCellPlane3d_ =  tfs->make<TH3D>("numCellPlane3d", "Ek:Num hit planes:num hit cells",
-                                         maxHitCells+1, -0.5, maxHitCells+0.5,
-                                         29, -0.5, 28.5,
-                                         pset_.get<unsigned>("numEnergyBins"),
-                                         pset_.get<double>("ekMin"),
-                                         pset_.get<double>("ekMax")
-                                         );
+    numCellPlane3d_ =  tfs->make<TH3D>("numCellPlane3d", "Ek:Num hit planes:num hit cells",
+                                       maxHitCells+1, -0.5, maxHitCells+0.5,
+                                       29, -0.5, 28.5,
+                                       pset_.get<unsigned>("numEnergyBins"),
+                                       pset_.get<double>("ekMin"),
+                                       pset_.get<double>("ekMax")
+                                       );
 
-      numCellPlane3d_->GetXaxis()->SetTitle("cells");
-      numCellPlane3d_->GetYaxis()->SetTitle("planes");
-      numCellPlane3d_->GetZaxis()->SetTitle("Ek, MeV");
+    numCellPlane3d_->GetXaxis()->SetTitle("cells");
+    numCellPlane3d_->GetYaxis()->SetTitle("planes");
+    numCellPlane3d_->GetZaxis()->SetTitle("Ek, MeV");
   }
 
   //================================================================
@@ -101,33 +101,37 @@ namespace mucap {
     const StepPointMCCollection& coll(*ih);
     //std::cout<<"MuCapSimHitsHist: got "<<coll.size()<<" sim hits"<<std::endl;
 
-    typedef std::set<WirePlaneId> PlaneSet;
-    PlaneSet hitPlanes;
-    typedef std::map<WireCellId, double> CellMap;
+    if(!coll.empty()) {
 
-    CellMap cellETotal;
-    CellMap cellEIonizing;
+      typedef std::set<WirePlaneId> PlaneSet;
+      PlaneSet hitPlanes;
+      typedef std::map<WireCellId, double> CellMap;
 
-    for(unsigned i=0; i<coll.size(); ++i) {
-      const MuCapSimHit sh(coll[i]);
-      // std::cout<<sh<<std::endl;
+      CellMap cellETotal;
+      CellMap cellEIonizing;
 
-      hitPlanes.insert(sh.cid().plane());
-      cellETotal[sh.cid()] += sh.hit().totalEDep();
-      cellEIonizing[sh.cid()] += sh.hit().ionizingEdep();
-    }
+      for(unsigned i=0; i<coll.size(); ++i) {
+        const MuCapSimHit sh(coll[i]);
+        // std::cout<<sh<<std::endl;
 
-    const double primaryEk = getPrimaryEk(event);
+        hitPlanes.insert(sh.cid().plane());
+        cellETotal[sh.cid()] += sh.hit().totalEDep();
+        cellEIonizing[sh.cid()] += sh.hit().ionizingEdep();
+      }
 
-    numCellPlane2d_->Fill(cellETotal.size(), hitPlanes.size());
-    numCellPlane3d_->Fill(cellETotal.size(), hitPlanes.size(), primaryEk);
+      const double primaryEk = getPrimaryEk(event);
 
-    for(CellMap::const_iterator i = cellETotal.begin(); i!=cellETotal.end(); ++i) {
-      cellEDepTotal_->Fill(i->second);
-    }
-    for(CellMap::const_iterator i = cellEIonizing.begin(); i!=cellEIonizing.end(); ++i) {
-      cellEDepIonizing_->Fill(i->second);
-    }
+      numCellPlane2d_->Fill(cellETotal.size(), hitPlanes.size());
+      numCellPlane3d_->Fill(cellETotal.size(), hitPlanes.size(), primaryEk);
+
+      for(CellMap::const_iterator i = cellETotal.begin(); i!=cellETotal.end(); ++i) {
+        cellEDepTotal_->Fill(i->second);
+      }
+      for(CellMap::const_iterator i = cellEIonizing.begin(); i!=cellEIonizing.end(); ++i) {
+        cellEDepIonizing_->Fill(i->second);
+      }
+
+    } // !coll.empty()
   }
 
   //================================================================

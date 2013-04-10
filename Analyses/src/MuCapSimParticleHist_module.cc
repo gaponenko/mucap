@@ -82,17 +82,19 @@ namespace mucap {
     event.getByLabel(inModuleLabel_, inInstanceName_, ih);
     const SimParticleCollection& coll(*ih);
 
-    cet::map_vector_key iprim(1);
-    const SimParticle primary(coll.getOrThrow(iprim));
-    primary_mom_->Fill(primary.startMomentum().vect().mag());
-    primary_ek_->Fill(primary.startMomentum().e() - primary.startMomentum().m());
-    primary_z_->Fill(primary.startPosition().z());
+    if(!coll.empty()) {
+      cet::map_vector_key iprim(1);
+      const SimParticle primary(coll.getOrThrow(iprim));
+      primary_mom_->Fill(primary.startMomentum().vect().mag());
+      primary_ek_->Fill(primary.startMomentum().e() - primary.startMomentum().m());
+      primary_z_->Fill(primary.startPosition().z());
 
-    for(SimParticleCollection::const_iterator i=coll.begin(); i!=coll.end(); ++i) {
-      if(i->first != iprim) {
-        const SimParticle& sp(i->second);
-        interaction_z0_->Fill(sp.startPosition().z());
-        interaction_z1_->Fill(sp.startPosition().z());
+      for(SimParticleCollection::const_iterator i=coll.begin(); i!=coll.end(); ++i) {
+        if(i->first != iprim) {
+          const SimParticle& sp(i->second);
+          interaction_z0_->Fill(sp.startPosition().z());
+          interaction_z1_->Fill(sp.startPosition().z());
+        }
       }
     }
   }
