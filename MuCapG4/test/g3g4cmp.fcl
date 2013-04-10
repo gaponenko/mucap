@@ -1,0 +1,32 @@
+#include "MuCapG4/test/mucap-common.fcl"
+
+physics.producers.generate : {
+   module_type : FromG3
+   pdgId : 2212
+   inputFileName : "protons8.dat"
+
+   histograms : {
+       kineticEnergy : {
+           xmin : 0
+           xmax : 100
+           nbins : 500
+       }
+       momentum : {
+           xmin : 0
+           xmax : 500
+           nbins : 500
+       }
+   }
+}
+
+//physics.producers.g4run.visMacro :  "MuCapG4/test/vis_mucap.mac"
+//physics.producers.g4run.SimParticlePrinter : {}
+
+process_name : g3g4cmp
+services.TFileService.fileName : "hist_g3g4cmp.root"
+outputs.outfile.fileName       : "data_g3g4cmp.root"
+
+// This tells emacs to view this file in the JavaScript mode.
+// Local Variables:
+// mode:js
+// End:
