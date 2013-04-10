@@ -27,7 +27,7 @@ muCapVtxGenerator : {
    
    position : {
        shape : targetCylinder
-       radius : 3 // mm
+       radius : 30 // mm
    }
    
    angles : {
