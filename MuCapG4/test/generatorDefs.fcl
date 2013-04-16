@@ -26,8 +26,8 @@ muCapVtxGenerator : {
    kineticEnergy : nil
    
    position : {
-       shape : targetCylinder
-       radius : 30 // mm
+       shape : muonStop
+       fileName : "uvanalysis.dat"
    }
    
    angles : {

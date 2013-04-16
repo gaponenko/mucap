@@ -20,6 +20,7 @@
 #include "MuCapGeom/inc/Geometry.hh"
 
 #include "MuCapGenerator/inc/PosGenCylinder.hh"
+#include "MuCapGenerator/inc/PosGenMuStop.hh"
 #include "MuCapGenerator/inc/AngleGenUniform.hh"
 #include "MuCapGenerator/inc/SpectrumGenFlat.hh"
 #include "MuCapGenerator/inc/SpectrumGenMECO.hh"
@@ -56,6 +57,11 @@ namespace mucap {
                             pset.get<double>("radius"),
                             0.5*geom->targetThickness(),
                             eng));
+    }
+    //----------------------------------------------------------------
+    else if(shape == "muonStop") {
+      return std::unique_ptr<IPositionGenerator>
+        (new PosGenMuStop(pset.get<std::string>("fileName"), eng));
     }
 
     //----------------------------------------------------------------
