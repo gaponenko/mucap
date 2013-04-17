@@ -37,6 +37,8 @@ namespace mucap {
     TH1 *interaction_z0_;
     TH1 *interaction_z1_;
 
+    TH2 *primary_xy_;
+
   public:
     explicit MuCapSimParticleHist(const fhicl::ParameterSet& pset);
     virtual void beginJob();
@@ -52,6 +54,7 @@ namespace mucap {
     , primary_z_()
     , interaction_z0_()
     , interaction_z1_()
+    , primary_xy_()
   {}
 
   //================================================================
@@ -73,6 +76,11 @@ namespace mucap {
 
     interaction_z1_ =  tfs->make<TH1D>("interaction_z1", "Interaction z", 4800, -600, +600);
     interaction_z1_->GetXaxis()->SetTitle("z [mm]");
+
+    primary_xy_ =  tfs->make<TH2D>("primary_xy", "Primary vtx y vs x", 201, -100.5, +100.5, 201, -100.5, +100.5);
+    primary_xy_->GetXaxis()->SetTitle("x [mm]");
+    primary_xy_->GetYaxis()->SetTitle("y [mm]");
+    primary_xy_->SetOption("colz");
   }
 
   //================================================================
@@ -88,6 +96,7 @@ namespace mucap {
       primary_mom_->Fill(primary.startMomentum().vect().mag());
       primary_ek_->Fill(primary.startMomentum().e() - primary.startMomentum().m());
       primary_z_->Fill(primary.startPosition().z());
+      primary_xy_->Fill(primary.startPosition().x(), primary.startPosition().y());
 
       for(SimParticleCollection::const_iterator i=coll.begin(); i!=coll.end(); ++i) {
         if(i->first != iprim) {
