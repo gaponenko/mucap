@@ -65,6 +65,7 @@ physics : {
         clarkdumper : {
             module_type : ClarkTreeDumper
             digiModuleLabel : "digitization"
+            simParticlesModuleLabel : "g4run"
         }
     }
     //================================================================

@@ -8,6 +8,10 @@
 #include "MuCapDataProducts/inc/MuCapRecoHit.hh"
 #include "MuCapDataProducts/inc/MuCapRecoHitCollection.hh"
 
+#include "MCDataProducts/inc/SimParticle.hh"
+#include "MCDataProducts/inc/SimParticleCollection.hh"
+
+
 #include "MuCapGeom/inc/Geometry.hh"
 
 // art includes.
@@ -58,6 +62,8 @@ namespace mucap {
   const unsigned AG_MAX_SCINTS = AG_MAXM_SCINTS + AG_MAXT_SCINTS + AG_MAXO_SCINTS;
   const unsigned MAXHITS_SC = AG_MAX_SCINTS * 8; // sc_mngw
 
+  const unsigned MAXMCTRK = 1000;
+
   //================================================================
   // EVID branch
   struct Clark_EVID {
@@ -95,13 +101,11 @@ namespace mucap {
   };
 
   //================================================================
-  struct Clark_WireHits {
-  };
-
-  //================================================================
   class ClarkTreeDumper : public art::EDAnalyzer {
     fhicl::ParameterSet pset_;
     std::string digiModuleLabel_;
+    std::string simParticlesModuleLabel_;
+    std::string simParticlesInstanceName_;
     art::ServiceHandle<Geometry> geom_;
 
     // Tree branch variables
@@ -130,6 +134,24 @@ namespace mucap {
     Int_t sc_iscint_[MAXHITS_SC];//[sc_nhits]
     Int_t sc_wire_[MAXHITS_SC];//[sc_nhits]
 
+    //_________________________ MC truth info  __________________________//
+    // See https://twist.triumf.ca/~e614/forum/view.php?bn=twist_montecarlo&key=1074716008
+    // and MOFIA's user/helixtree.f90
+    Int_t nmctr;
+    Int_t mctrack_itrack[MAXMCTRK];//[nmctr]
+    Int_t mctrack_pid[MAXMCTRK];   //[nmctr]
+    Int_t mctrack_voff[MAXMCTRK];  //[nmctr]
+    Int_t mctrack_nv[MAXMCTRK];    //[nmctr]
+    Int_t nmcvtx;
+    Float_t mcvertex_ptot[MAXMCTRK];//[nmcvtx]
+    Float_t mcvertex_costh[MAXMCTRK];//[nmcvtx]
+    Float_t mcvertex_phimuv[MAXMCTRK];//[nmcvtx]
+    Float_t mcvertex_time[MAXMCTRK];//[nmcvtx]
+    Float_t mcvertex_vu[MAXMCTRK];//[nmcvtx]
+    Float_t mcvertex_vv[MAXMCTRK];//[nmcvtx]
+    Float_t mcvertex_vz[MAXMCTRK];//[nmcvtx]
+    Int_t mcvertex_istop[MAXMCTRK];//[nmcvtx]
+
     //----------------
     TTree *nt_;
 
@@ -143,9 +165,13 @@ namespace mucap {
   ClarkTreeDumper::ClarkTreeDumper(const fhicl::ParameterSet& pset)
     : pset_(pset)
     , digiModuleLabel_(pset.get<std::string>("digiModuleLabel"))
+    , simParticlesModuleLabel_(pset.get<std::string>("simParticlesModuleLabel"))
+    , simParticlesInstanceName_(pset.get<std::string>("simParticlesInstanceName", ""))
     , dc_nhits_(0)
     , pc_nhits_(0)
     , sc_nhits_(0)
+    , nmctr(0)
+    , nmcvtx(0)
     , nt_(nullptr)
   {
   }
@@ -177,6 +203,23 @@ namespace mucap {
     bschits->FindLeaf("SC_width")->SetAddress(&sc_width_);
     bschits->FindLeaf("SC_iscint")->SetAddress(&sc_iscint_);
     bschits->FindLeaf("SC_wire")->SetAddress(&sc_wire_);
+
+    //MC truth
+    nt_->Branch("Nmctr", &nmctr, "nmctr/I");
+    nt_->Branch("MCTrack_itrack", mctrack_itrack, "mctrack_itrack[nmctr]/I");
+    nt_->Branch("MCTrack_pid"   , mctrack_pid, "mctrack_pid[nmctr]/I"   );
+    nt_->Branch("MCTrack_voff"  , mctrack_voff, "mctrack_voff[nmctr]/I"  );
+    nt_->Branch("MCTrack_nv"    , mctrack_nv, "mctrack_nv[nmctr]/I"    );
+
+    nt_->Branch("Nmcvtx", &nmcvtx, "nmcvtx/I");
+    nt_->Branch("MCVertex_ptot"  , mcvertex_ptot, "mcvertex_ptot[nmcvtx]/F"  );
+    nt_->Branch("MCVertex_costh" , mcvertex_costh, "mcvertex_costh[nmcvtx]/F" );
+    nt_->Branch("MCVertex_phimuv", mcvertex_phimuv, "mcvertex_phimuv[nmcvtx]/F");
+    nt_->Branch("MCVertex_time"  , mcvertex_time, "mcvertex_time[nmcvtx]/F"  );
+    nt_->Branch("MCVertex_vu"    , mcvertex_vu, "mcvertex_vu[nmcvtx]/F"    );
+    nt_->Branch("MCVertex_vv"    , mcvertex_vv, "mcvertex_vv[nmcvtx]/F"    );
+    nt_->Branch("MCVertex_vz"    , mcvertex_vz, "mcvertex_vz[nmcvtx]/F"    );
+    nt_->Branch("MCVertex_istop" , mcvertex_istop, "mcvertex_istop[nmcvtx]/I" );
   }
 
   //================================================================
@@ -218,6 +261,68 @@ namespace mucap {
       const WireReadoutId rid = pchits[i].rid();
       pc_plane_[i] = geom_->wpByGlobalNumber(rid.plane().number()).localPlane;
       pc_cell_[i] = rid.channel();
+    }
+
+    //----------------------------------------------------------------
+    // Write out MC truth
+
+    art::Handle<mu2e::SimParticleCollection> hparticles;
+    event.getByLabel(simParticlesModuleLabel_, simParticlesInstanceName_, hparticles);
+    const mu2e::SimParticleCollection& particles(*hparticles);
+
+    {
+      // Write out only the primary track (proton or DIO electron)
+      cet::map_vector_key iprim(1);
+      const mu2e::SimParticle primary(particles.getOrThrow(iprim));
+
+      nmctr = 0;
+      nmcvtx = 0;
+
+      mctrack_itrack[nmctr] = primary.id().asInt();
+      mctrack_pid[nmctr] = primary.pdgId();
+      mctrack_voff[nmctr] = nmcvtx;
+
+      mctrack_nv[nmctr] = 2; // write out begin and end vertexes
+
+      //----------------
+      // Start vertex
+
+      // Clark expects momenta in  MeV/c, this is what we have
+      mcvertex_ptot[nmcvtx] = primary.startMomentum().vect().mag();
+      mcvertex_costh[nmcvtx] = primary.startMomentum().vect().cosTheta();
+      mcvertex_phimuv[nmcvtx] = primary.startMomentum().vect().phi(); // FIXME: convert to UV
+      mcvertex_time[nmcvtx] = primary.startGlobalTime();
+
+      // FIXME: convert to UV
+      // Convert mm to cm for Clark
+      mcvertex_vu[nmcvtx] = primary.startPosition().x()/10.;
+      mcvertex_vv[nmcvtx] = primary.startPosition().y()/10.;
+      mcvertex_vz[nmcvtx] = primary.startPosition().z()/10.;
+
+      mcvertex_istop[nmcvtx] = 0;
+      
+      ++nmcvtx;
+
+      //----------------
+      // Stop vertex
+      mcvertex_ptot[nmcvtx] = primary.endMomentum().vect().mag();
+      mcvertex_costh[nmcvtx] = primary.endMomentum().vect().cosTheta();
+      mcvertex_phimuv[nmcvtx] = primary.endMomentum().vect().phi();
+      mcvertex_time[nmcvtx] = primary.endGlobalTime();
+
+      // Convert mm to cm
+      mcvertex_vu[nmcvtx] = primary.endPosition().x()/10.;;
+      mcvertex_vv[nmcvtx] = primary.endPosition().y()/10.;;
+      mcvertex_vz[nmcvtx] = primary.endPosition().z()/10.;;
+
+      mcvertex_istop[nmcvtx] = primary.stoppingCode().id();
+      
+      ++nmcvtx;
+
+      //----------------
+      // End of track processing
+
+      ++nmctr;
     }
 
     //----------------------------------------------------------------
