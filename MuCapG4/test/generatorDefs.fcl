@@ -6,6 +6,7 @@ BEGIN_PROLOG
 
 //================================================================
 mecoSpectrum : {
+   variable: kineticEnergy
    spectrum : MECO
    Tth : 1.4 // MeV
    alpha : 1.3279
@@ -14,6 +15,7 @@ mecoSpectrum : {
 
 //================================================================
 dioSpectrum : {
+   variable: kineticEnergy
    spectrum : tabulated
    tableFileName : "MuCapGenerator/data/muonDIOAlvsEk"
 }
@@ -23,7 +25,7 @@ muCapVtxGenerator : {
    module_type : MuCapVtxKludge
    
    pdgId : nil
-   kineticEnergy : nil
+   energySpec : nil
    
    position : {
        shape : muonStop

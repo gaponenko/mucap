@@ -1,7 +1,7 @@
 #include "MuCapG4/test/mucap-common.fcl"
 
 physics.producers.generate.pdgId : 11
-physics.producers.generate.kineticEnergy : @local::dioSpectrum
+physics.producers.generate.energySpec : @local::dioSpectrum
 //debug: physics.producers.generate.kineticEnergy : { spectrum: flat center: 53 halfWidth: 0}
 //debug: physics.producers.generate.angles : { czmin : 0  czmax : +0.4 }
 //debug: physics.producers.g4run.visMacro :  "MuCapG4/test/vis_mucap.mac"
