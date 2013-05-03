@@ -12,7 +12,7 @@ namespace mucap {
     // non-const because it modifies the random number generator state
     virtual CLHEP::Hep3Vector generate() = 0;
 
-    ~IPositionGenerator() {}
+    virtual ~IPositionGenerator() {}
   };
 }
 

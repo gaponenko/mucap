@@ -12,7 +12,7 @@ namespace mucap {
     // non-const because it modifies the random number generator state
     virtual double generate() = 0;
 
-    ~ISpectrumGenerator() {}
+    virtual ~ISpectrumGenerator() {}
   };
 }
 

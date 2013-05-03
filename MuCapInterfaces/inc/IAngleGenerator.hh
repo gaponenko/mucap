@@ -13,7 +13,7 @@ namespace mucap {
     // The output is a unit vector.
     virtual CLHEP::Hep3Vector generate() = 0;
 
-    ~IAngleGenerator() {}
+    virtual ~IAngleGenerator() {}
   };
 }
 
