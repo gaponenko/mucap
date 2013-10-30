@@ -47,7 +47,8 @@ namespace mucap {
 
   //================================================================
   MuCapSimParticleHist::MuCapSimParticleHist(const fhicl::ParameterSet& pset)
-    : inModuleLabel_(pset.get<std::string>("inputModuleLabel"))
+    : art::EDAnalyzer(pset)
+    , inModuleLabel_(pset.get<std::string>("inputModuleLabel"))
     , inInstanceName_(pset.get<std::string>("inputInstanceName", ""))
     , primary_ek_()
     , primary_mom_()

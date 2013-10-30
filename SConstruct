@@ -69,7 +69,7 @@ babarlibs = [ 'mu2e_BaBar_KalmanTrack',     'mu2e_BaBar_DetectorModel',      'mu
 
 # Define scons-local environment - it will be exported later.
 osenv = {}
-for var in [ 'LD_LIBRARY_PATH',  'GCC_FQ_DIR',  'PATH', 'PYTHONPATH',  'ROOTSYS' ]:
+for var in [ 'LD_LIBRARY_PATH',  'GCC_FQ_DIR',  'PATH', 'PYTHONPATH',  'ROOTSYS', 'PYTHON_ROOT', 'PYTHON_DIR', 'SQLITE_DIR' ]:
     if var in os.environ.keys():
         osenv[var] = os.environ[var]
         pass
@@ -141,6 +141,7 @@ SetOption('warn', 'no-fortran-cxx-mix')
 env.MergeFlags('-std=c++11')
 env.MergeFlags('-rdynamic')
 env.MergeFlags('-Wall')
+env.MergeFlags('-Wno-unused-local-typedefs')
 env.MergeFlags('-g')
 if level == 'prof':
     env.MergeFlags('-O3')

@@ -89,7 +89,8 @@ namespace mucap {
 
   //================================================================
   ProtonHitDumper::ProtonHitDumper(const fhicl::ParameterSet& pset)
-    : pset_(pset)
+    : art::EDAnalyzer(pset)
+    , pset_(pset)
     , hitsModuleLabel_(pset.get<std::string>("hitsModuleLabel"))
     , hitsInstanceName_(pset.get<std::string>("hitsInstanceName", ""))
     , particlesModuleLabel_(pset.get<std::string>("particlesModuleLabel"))

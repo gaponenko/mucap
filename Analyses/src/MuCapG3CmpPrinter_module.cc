@@ -40,7 +40,8 @@ namespace mucap {
 
   //================================================================
   MuCapG3CmpPrinter::MuCapG3CmpPrinter(const fhicl::ParameterSet& pset)
-    : inModuleLabel_(pset.get<std::string>("particlesModuleLabel"))
+    : art::EDAnalyzer(pset)
+    , inModuleLabel_(pset.get<std::string>("particlesModuleLabel"))
     , inInstanceName_(pset.get<std::string>("particlesInstanceName", ""))
     , outFileName_(pset.get<std::string>("outFileName"))
   {}

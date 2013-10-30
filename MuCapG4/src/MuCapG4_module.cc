@@ -19,6 +19,7 @@
 //#define AGDEBUG(stuff)
 
 
+#include "MuCapGeom/inc/Geometry.hh"
 #include "MuCapG4/inc/MuCapWorld.hh"
 #include "MuCapG4/inc/MuCapMaterials.hh"
 #include "MuCapG4/inc/MuCapSD.hh"
@@ -28,6 +29,7 @@
 #include "Mu2eG4/inc/Mu2eG4RunManager.hh"
 #include "Mu2eG4/inc/WorldMaker.hh"
 #include "Mu2eG4/inc/SensitiveDetectorHelper.hh"
+#include "Mu2eG4/inc/SimParticlePrimaryHelper.hh"
 #include "Mu2eG4/inc/addPointTrajectories.hh"
 #include "Mu2eG4/inc/exportG4PDT.hh"
 #include "GeometryService/inc/GeometryService.hh"
@@ -157,7 +159,7 @@ namespace mucap {
     //    DiagnosticsG4 _diagnostics; // fixme, we may need another one for this study module
 
     // Do the G4 initialization that must be done only once per job, not once per run
-    void initializeG4( GeometryService& geom, art::Run const& run );
+    void initializeG4( mu2e::GeometryService& geom, art::Run const& run );
 
   }; // end G4 header
 
@@ -223,7 +225,7 @@ namespace mucap {
     static int ncalls(0);
     ++ncalls;
 
-    art::ServiceHandle<GeometryService> geom;
+    art::ServiceHandle<mu2e::GeometryService> geom;
 
     // Do the main initialization of G4; only once per job.
     if ( ncalls == 1 ) {
@@ -273,7 +275,7 @@ namespace mucap {
 
   }
 
-  void MuCapG4::initializeG4( GeometryService& geom, art::Run const& run ){
+  void MuCapG4::initializeG4( mu2e::GeometryService& geom, art::Run const& run ){
 
     SimpleConfig const& config = geom.config();
 
@@ -300,7 +302,7 @@ namespace mucap {
 
     _runManager->SetUserInitialization(pL);
 
-    _genAction = new PrimaryGeneratorAction(_generatorModuleLabel);
+    _genAction = new PrimaryGeneratorAction();
     _runManager->SetUserAction(_genAction);
 
     _steppingAction = new StudySteppingAction(config);
@@ -379,7 +381,10 @@ namespace mucap {
 
     _trackingAction->beginEvent(gensHandle, simPartId, event);
 
-    _genAction->setEvent(event);
+    // ProductID for the SimParticleCollection.
+    SimParticlePrimaryHelper parentHelper(event, simPartId, gensHandle);
+    HitHandles genInputHits;
+    _genAction->setEventData(&*gensHandle, genInputHits, &parentHelper);
 
     _steppingAction->BeginOfEvent(*tvdHits, *steppingPoints, simPartId, event );
 

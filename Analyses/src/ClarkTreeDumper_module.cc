@@ -163,7 +163,8 @@ namespace mucap {
 
   //================================================================
   ClarkTreeDumper::ClarkTreeDumper(const fhicl::ParameterSet& pset)
-    : pset_(pset)
+    : art::EDAnalyzer(pset)
+    , pset_(pset)
     , digiModuleLabel_(pset.get<std::string>("digiModuleLabel"))
     , simParticlesModuleLabel_(pset.get<std::string>("simParticlesModuleLabel"))
     , simParticlesInstanceName_(pset.get<std::string>("simParticlesInstanceName", ""))

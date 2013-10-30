@@ -74,7 +74,8 @@ namespace mucap {
 
   //================================================================
   G3G4CmpDumper::G3G4CmpDumper(const fhicl::ParameterSet& pset)
-    : g4ModuleLabel_(pset.get<std::string>("g4ModuleLabel"))
+    : art::EDAnalyzer(pset)
+    , g4ModuleLabel_(pset.get<std::string>("g4ModuleLabel"))
     , g4InstanceName_(pset.get<std::string>("g4InstanceName"))
     , g3StopsModuleLabel_(pset.get<std::string>("g3StopsModuleLabel"))
     , g3StopsInstanceName_(pset.get<std::string>("g3StopsInstanceName"))
