@@ -53,7 +53,8 @@ namespace mucap {
     double mass_;
 
     std::unique_ptr<IPositionGenerator> pos_;
-    std::unique_ptr<ISpectrumGenerator> ek_;
+    std::unique_ptr<ISpectrumGenerator> energyVar_;
+    bool energyVarIsEk_;
     std::unique_ptr<IAngleGenerator> omega_;
     std::unique_ptr<ISpectrumGenerator> time_;
 
@@ -70,13 +71,34 @@ namespace mucap {
     , pdgId_(PDGCode::type(pset.get<int>("pdgId")))
     , mass_(mu2e::GlobalConstantsHandle<mu2e::ParticleDataTable>()->particle(pdgId_).ref().mass().value())
     , pos_(makePositionGenerator(pset.get<ParameterSet>("position"), eng_))
-    , ek_(makeSpectrumGenerator(pset.get<ParameterSet>("kineticEnergy"), eng_))
+    , energyVarIsEk_(true)
     , omega_(makeAngleGenerator(pset.get<ParameterSet>("angles"), eng_))
     , time_(makeSpectrumGenerator(pset.get<ParameterSet>("time"), eng_))
     , hek_()
     , hmomentum_()
   {
     produces<GenParticleCollection>();
+
+    const fhicl::ParameterSet energyPars = pset.get<ParameterSet>("energySpec");
+    const std::string evname = energyPars.get<std::string>("variable");
+
+    energyVar_ = makeSpectrumGenerator(energyPars, eng_);
+    if(evname == "kineticEnergy") {
+      energyVarIsEk_ = true;
+    }
+    else if(evname == "momentum") {
+      energyVarIsEk_ = false;
+    }
+    else {
+      throw cet::exception("CONFIG")<<__func__<<": unknown energySpec variable: "<<evname<<"\n";
+    }
+
+    // the parametrization is specifically for energy, momentum var would probably be due to a mistake
+    if(energyPars.get<std::string>("spectrum") == "MECO") {
+      if(!energyVarIsEk_) {
+	throw cet::exception("CONFIG")<<__func__<<": unknown energySpec variable is not kineticEnergy for the MECO spectrum\n";
+      }
+    }
 
     ParameterSet hset(pset.get<ParameterSet>("histograms"));
     art::ServiceHandle<art::TFileService> tfs;
@@ -108,11 +130,18 @@ namespace mucap {
   void MuCapGun::produce(art::Event& event) {
     std::unique_ptr<GenParticleCollection> output(new GenParticleCollection);
 
-    const double ek = ek_->generate();
+    double ek=0., etot=0., pmag=0.;
+    if(energyVarIsEk_) {
+      ek = energyVar_->generate();
+      etot = mass_ + ek;
+      pmag = sqrt(std::pow(etot,2) - std::pow(mass_, 2));
+    }
+    else { // var is momentum
+      pmag = energyVar_->generate();
+      etot = std::sqrt(std::pow(pmag,2) + std::pow(mass_, 2));
+      ek = etot - mass_;
+    }
     if(hek_) { hek_->Fill(ek); }
-
-    const double etot = mass_ + ek;
-    const double pmag = sqrt(std::pow(etot,2) - std::pow(mass_, 2));
     if(hmomentum_) { hmomentum_->Fill(pmag); }
 
     const CLHEP::HepLorentzVector momentum(pmag * omega_->generate(), etot);

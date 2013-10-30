@@ -50,11 +50,12 @@ physics : {
                 radius : 3 // mm
             }
 
-            kineticEnergy : {
+            energySpec: {
+                variable: kineticEnergy
                 spectrum : exp
                 scale : 3.5 // Slower decay than MECO's T0
                 min   : 1 // MeV - below Tth
-            }
+	    }
 
             angles : {
                 czmin : -1
