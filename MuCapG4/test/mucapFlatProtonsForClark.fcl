@@ -1,0 +1,17 @@
+#include "MuCapG4/test/mucap-clark-common.fcl"
+
+physics.producers.generate.pdgId : 2212
+physics.producers.generate.energySpec : {
+   variable: momentum
+   spectrum: flat
+   center: 160
+   halfWidth: 160
+}
+
+process_name : mucapFlatProtonsForClark
+services.TFileService.fileName : "hist_mucapFlatProtonsForClark.root"
+
+// This tells emacs to view this file in the JavaScript mode.
+// Local Variables:
+// mode:js
+// End:
