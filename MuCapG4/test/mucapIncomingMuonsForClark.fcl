@@ -1,0 +1,52 @@
+#include "MuCapG4/test/mucap-clark-common.fcl"
+
+physics.producers.generate:  {
+   module_type : MuCapGun
+   
+   pdgId : +13 // muminus
+   energySpec : {
+      variable: momentum
+      spectrum: flat
+      center: 25.0
+      halfWidth: 0.2
+   }
+   
+   position : {
+       shape : cylinder
+       radius: 20 // mm
+       halfdz: 0 //mm
+       position : [ 0, 0, -1100. ]
+   }
+   
+   angles : {
+       czmin : +1
+       czmax : +1
+   }
+   
+   time : {
+       spectrum : flat
+       center : 0
+       halfWidth: 0
+   }
+
+   histograms : {
+       kineticEnergy : {
+           xmin : 0
+           xmax : 100
+           nbins : 500
+       }
+       momentum : {
+           xmin : 0
+           xmax : 500
+           nbins : 500
+       }
+   }
+}
+
+process_name : mucapFlatProtonsForClark
+services.TFileService.fileName : "hist_mucapFlatProtonsForClark.root"
+
+// This tells emacs to view this file in the JavaScript mode.
+// Local Variables:
+// mode:js
+// End:
