@@ -169,6 +169,8 @@ mylibs = [
     'mu2e_Mu2eUtilities',
     'mu2e_MCDataProducts',
     'mu2e_GeneralUtilities',
+    'mu2e_Mu2eG4',
+    'mu2e_G4Helper',
     G4LIBS,
     'CLHEP',
     OPENGL_LIBS,
