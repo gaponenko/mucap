@@ -147,6 +147,14 @@ namespace mucap {
     }
 
     //----------------------------------------------------------------
+    // Write out geometry into a gdml file.
+    if (geom_->pset().get<bool>("writeGDML", false)) {
+      string gdmlFileName = geom_->pset().get<std::string>("GDMLFileName","mucap.gdml");
+      G4GDMLParser parser;
+      parser.Write(gdmlFileName, worldVInfo.logical);
+    }
+
+    //----------------------------------------------------------------
 
     return worldVInfo.physical;
   }

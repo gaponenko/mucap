@@ -263,6 +263,7 @@ chamberModules00061 : [
 mucapGeometry : {
     forceAuxEdgeVisible : true
     doSurfaceCheck : false
+    writeGDML : false
 
     world : {
         // solenoid inner bore: ID=1m, L=223cm
