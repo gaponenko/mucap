@@ -91,6 +91,27 @@ namespace mucap {
     cradlegas->AddMaterial(G4He, 1-n2MassFraction);
 
     //----------------------------------------------------------------
+    G4Material *G4CO2 = mu2e::findMaterialOrThrow("G4_CARBON_DIOXIDE");
+
+    G4double densityCO2  = 0.00184 *g/cm3; //from PDG
+    G4double co2VolumeFraction  = pset_.get<double>("gabsGasCO2VolumeFraction");
+
+    const double co2MassFraction = co2VolumeFraction * densityCO2
+      /(co2VolumeFraction * densityCO2 + (1-co2VolumeFraction)*G4He->GetDensity());
+
+    double gabs_density = co2VolumeFraction*densityCO2 + (1.0-co2VolumeFraction)*G4He->GetDensity();
+
+    std::cout<<"MUCAP_GABS_GAS: CO2 volume fraction = "<<co2VolumeFraction
+             <<", mass fraction = "<<co2MassFraction
+             <<", density = "<<(gabs_density)/(mg/cm3)
+             <<" mg/cm3"<<std::endl;
+
+    G4Material *gabs_gas = new G4Material("MUCAP_GABS_GAS", gabs_density, ncomp=2);
+
+    gabs_gas->AddMaterial(G4CO2, co2MassFraction);
+    gabs_gas->AddMaterial(G4He, 1-co2MassFraction);
+
+    //----------------------------------------------------------------
     // FR4 was sometimes referred to as "G10" in TWIST, but is a
     // different newer material.  This is a fiberglass-epoxy
     // composite.  For the lack of better information I'll use
