@@ -59,7 +59,14 @@ namespace mucap {
   mu2e::VolumeInfo MuCapWorld::constructDetectorEnclosure(const VolumeInfo& parent, const fhicl::ParameterSet& pset) {
 
     CLHEP::Hep3Vector detectorCenter(0,0,0);
-    const double rInside = pset.get<double>("hous_radius") - pset.get<double>("hous_mantle");
+
+    const double rOut = pset.get<double>("hous_radius");
+    const double rInsideWall = rOut - pset.get<double>("hous_mantle");
+    const double hlen1 = pset.get<double>("hent_length_1");
+
+    // The detector mother, filled with He/N2.  The foils on the ends are placed into the mother
+    // so the He/N2 length is slightly smaller than that
+    const double motherLength = pset.get<double>("hous_length") + 2*hlen1;
 
     // The volume are arranged differently than in G3: for easier
     // visualization with the GDML viewer I don't want to make Al
@@ -67,7 +74,7 @@ namespace mucap {
     // is filled with He/N2, and solid walls (leaf volumes) are placed
     // into it.
 
-    TubsParams mother_params(0., pset.get<double>("hous_radius"), pset.get<double>("hous_length")/2+pset.get<double>("hous_cover"));
+    TubsParams mother_params(0., rOut, motherLength/2);
 
     VolumeInfo mother = nestTubs("HOUS_MOTHER",
                                  mother_params,
@@ -84,15 +91,13 @@ namespace mucap {
                                  doSurfaceCheck_
                                  );
 
-    TubsParams hous_wall_params(rInside,
-                                pset.get<double>("hous_radius"),
-                                pset.get<double>("hous_length")/2 + pset.get<double>("hous_cover"));
+    TubsParams hous_wall_params(rInsideWall, rOut, mother_params.zHalfLength());
 
     VolumeInfo wall = nestTubs("HOUS_WALL",
                                hous_wall_params,
                                findMaterialOrThrow(pset.get<string>("hous_wall_material")),
                                0, // no rotation
-                               CLHEP::Hep3Vector(0,0,0), // center in parent
+                               CLHEP::Hep3Vector(0,0,0),
                                mother,
                                0,
                                pset.get<bool>("hous_wall_visible"),
@@ -106,9 +111,8 @@ namespace mucap {
     //----------------------------------------------------------------
     // Internal (He/N2 side) part of the end cover
 
-    const double hlen1 = pset.get<double>("hent_length_1");
     const double hent1_r = pset.get<double>("hent_radius_1");
-    TubsParams hen1_ring_params(hent1_r, rInside, hlen1/2);
+    TubsParams hen1_ring_params(hent1_r, rInsideWall, hlen1/2);
     const double hen1_ring_zabs = pset.get<double>("hous_length")/2 + hlen1/2;
 
     nestTubs("housInRingUp",
@@ -179,55 +183,20 @@ namespace mucap {
              );
 
     //----------------------------------------------------------------
-    // The part outside of the He/N2 volume.
-    // First fill it with air, than place Al pieces inside air.
-
-    const double hlen2 = pset.get<double>("hous_cover") - hlen1;
-    TubsParams hen2_air_params(0, rInside, hlen2/2);
-    const double hen2_air_zabs = pset.get<double>("hous_length")/2 + hlen1 + hlen2/2;
-
-    VolumeInfo airUp = nestTubs("housAirUp",
-                                hen2_air_params,
-                                findMaterialOrThrow(pset.get<string>("hous_outside_material")),
-                                0, // no rotation
-                                CLHEP::Hep3Vector(0,0, -hen2_air_zabs),
-                                mother,
-                                0,
-                                pset.get<bool>("hous_visible"),
-                                G4Colour::Yellow(),
-                                pset.get<bool>("hous_solid"),
-                                forceAuxEdgeVisible_,
-                                placePV_,
-                                doSurfaceCheck_
-                                );
-
-    VolumeInfo airDn = nestTubs("housAirDn",
-                                hen2_air_params,
-                                findMaterialOrThrow(pset.get<string>("hous_outside_material")),
-                                0, // no rotation
-                                CLHEP::Hep3Vector(0,0, +hen2_air_zabs),
-                                mother,
-                                0,
-                                pset.get<bool>("hous_visible"),
-                                G4Colour::Yellow(),
-                                pset.get<bool>("hous_solid"),
-                                forceAuxEdgeVisible_,
-                                placePV_,
-                                doSurfaceCheck_
-                                );
-
-    //----------------
-    // The air-side ring
+    // The mechanical pieces extending beyond the foils are placed
+    // outside of the detector mother
 
     const double hent2_r = pset.get<double>("hent_radius_2");
-    TubsParams hen2_ring_params(hent2_r, rInside, hlen2/2);
+    const double hlen2 = pset.get<double>("hous_cover") - hlen1;
+    TubsParams hen2_ring_params(hent2_r, rOut,  hlen2/2);
+    CLHEP::Hep3Vector hen2Offset(0,0, mother_params.zHalfLength() + hen2_ring_params.zHalfLength());
 
     nestTubs("housOutRingUp",
              hen2_ring_params,
              findMaterialOrThrow(pset.get<string>("hous_wall_material")),
              0, // no rotation
-             CLHEP::Hep3Vector(0,0, 0),
-             airUp,
+             detectorCenter - hen2Offset,
+             parent,
              0,
              pset.get<bool>("hous_wall_visible"),
              G4Colour::Grey(),
@@ -241,8 +210,8 @@ namespace mucap {
              hen2_ring_params,
              findMaterialOrThrow(pset.get<string>("hous_wall_material")),
              0, // no rotation
-             CLHEP::Hep3Vector(0,0, 0),
-             airDn,
+             detectorCenter + hen2Offset,
+             parent,
              0,
              pset.get<bool>("hous_wall_visible"),
              G4Colour::Grey(),
@@ -257,14 +226,14 @@ namespace mucap {
 
     const double flunsh_len = pset.get<double>("hent_flunsh");
     TubsParams flunsh_ring_params(hent1_r, hent2_r, flunsh_len/2);
-    const double flunsh_zabs = hlen2/2 - flunsh_len/2;
+    CLHEP::Hep3Vector flunshOffset(0,0, mother_params.zHalfLength() + flunsh_ring_params.zHalfLength());
 
     nestTubs("housFlunshUp",
              flunsh_ring_params,
              findMaterialOrThrow(pset.get<string>("hous_wall_material")),
              0, // no rotation
-             CLHEP::Hep3Vector(0,0, +flunsh_zabs),
-             airUp,
+             detectorCenter - flunshOffset,
+             parent,
              0,
              pset.get<bool>("hous_wall_visible"),
              G4Colour::Grey(),
@@ -278,8 +247,8 @@ namespace mucap {
              flunsh_ring_params,
              findMaterialOrThrow(pset.get<string>("hous_wall_material")),
              0, // no rotation
-             CLHEP::Hep3Vector(0,0, -flunsh_zabs),
-             airDn,
+             detectorCenter + flunshOffset,
+             parent,
              0,
              pset.get<bool>("hous_wall_visible"),
              G4Colour::Grey(),
