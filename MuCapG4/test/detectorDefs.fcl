@@ -268,7 +268,7 @@ mucapGeometry : {
 
     world : {
         halfLength : [ 4500, 4500, 4500] // as in TWIST G3
-        material : "MUCAP_CRADLE_GAS" // FIXME: should be "G4_AIR", need to implement HEBAG
+        material : "G4_AIR"
         BFieldInTesla : 2.0
         maxG4StepLength : 1 // mm, for visualization
         visible : false
@@ -277,25 +277,28 @@ mucapGeometry : {
 
     // Detector He enclosure. Follow G3's extra_geom.par, convert cm to mm
     hous : {
-        hous_radius: 514.8834
-	hous_length: 1495.2980
-	hous_cover: 76.2
-	hous_mantle: 2.3876
-	hous_wall_visible: true
-	hous_wall_solid: false
+        hous_radius: 514.8834   // the outer radius of the enclosure, including the wall
+	hous_length: 1495.2980  // the length of the outer wall (the cylinder) between the covers
+	hous_cover: 76.2  // the length of the cover
+	hous_mantle: 2.3876  // the thickness of the cylinder wall
 
-        hous_material : "MUCAP_CRADLE_GAS"
+	foil_thickness: 0.00635    // qrt_thou
+	hent_radius_1: 170.053     // hole in the cover, on the He/N2 side of the foil
+	hent_length_1: 28.197175   // He/N2 side cover edge to foil distance + foil thickness
+	hent_radius_2: 195.453     // hole in the cover, on the air side of the foil
+	hent_flunsh: 6.35 // the length of a retaining ring, r1 to r2 flush to the step between the radii
+
+        hous_inside_material: "MUCAP_CRADLE_GAS"
+        hous_wall_material: "G4_Al"
+	hous_foil_material: "G4_MYLAR"
+        hous_outside_material: "G4_AIR"
+
 	hous_visible: false
 	hous_solid: false
-
-	hent_radius_1: 170.053
-	hent_radius_2: 195.453
-	hent_length_1: 28.197175
-	hent_length_2:  48.002825
-	hent_flunsh: 6.35
-
-        visible : false
-        solid   : false
+	hous_wall_visible: true
+	hous_wall_solid: false
+	hous_foil_visible: true
+	hous_foil_solid: true
     }
 
     cellSD : {
