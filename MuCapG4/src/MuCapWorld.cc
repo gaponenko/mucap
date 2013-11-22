@@ -144,6 +144,8 @@ namespace mucap {
     // Detector He enclosure
     VolumeInfo hous  = constructDetectorEnclosure(worldVInfo, geom_->pset().get<ParameterSet>("hous"));
 
+    constructScintillators(worldVInfo, geom_->pset().get<ParameterSet>("scintillators"));
+
     //----------------------------------------------------------------
     vector<ParameterSet> modulePars(geom_->pset().get<vector<ParameterSet> >("chamberModules"));
     for(unsigned i = 0, wpoff=1; i < modulePars.size(); ++i) {

@@ -25,6 +25,7 @@ namespace mucap {
     static const std::string targetModuleType_;
 
     mu2e::VolumeInfo constructDetectorEnclosure(const mu2e::VolumeInfo& parent, const fhicl::ParameterSet& pset);
+    void constructScintillators(const mu2e::VolumeInfo& parent, const fhicl::ParameterSet& pset);
 
     // Returns the number of planes in the module
     unsigned constructChamberModule(unsigned moduleNumber,

@@ -301,6 +301,49 @@ mucapGeometry : {
 	hous_foil_solid: true
     }
 
+    scintillators : {
+	rIn: [ 0., 30., 30., 0., 0.]
+	rOut: [ 30., 185., 185., 215., 216. ]
+	thick: [  0.239, 6.350, 6.350,  3.175,  3.175 ]
+
+	// It looks like G3 offset mu scints (but not t0 scints) from
+	// the geometry file position by the wrapping thickness.  G4 code
+	// does not do that.   One can adjust the zcenter numbers below
+	// to reproduce the exact G3 positions.  At the moment the numbers
+	// are straight from dt_geo.00066 converted to mm, without the adjustment.
+
+	// Notes:
+	//
+	// 1) the muon counter in G3 is placed in HEBG.  The -80.8735 cm
+	// z position specified  in dt_geo.00066 is ignored, and instead
+        // the counter+wrapping is placed flush at the HEBG end, inside,
+	// at global z=-80.8751176 cm.  In G4 we always place it at the
+	// specified zcenter position.
+	//
+	// 2) The upstream t0 counters in G3 are at -80.5435 and -79.9085.
+	// This leaves no room for the wrapping, which is not in G3.
+	// Since we wrap all scintillators, a t0 counter is moved here by
+	// twice the total wrap thickness from -805.435 mm to -805.47828 mm.
+	
+	zcenter: [ -808.735, -805.47828, -799.085, 1502., 1507. ]
+
+	// The material for (at least some of) the scintillators is BC408,
+	// which is based on polyvinyltoluene.  The G4 standard plastic
+	// has the same density 1.032 g/cm3 as what TWIST G3 uses,
+	// and a similar, but not the same C:H ratio
+        scint_material: "G4_PLASTIC_SC_VINYLTOLUENE"
+
+	// From inside out:
+	wrap_materials: [ "G4_Al", "G4_MYLAR" ]
+	wrap_thicknesses: [ 0.01082, 0.01082 ] // G3:  0.002164 cm, split equally between Al and Mylar
+
+	scint_visible: true
+	scint_solid: true
+
+	wrap_visible: true
+	wrap_solid: true
+    }
+
     cellSD : {
         hitsSizeLimit : 0 // zero for unlimited
     }
