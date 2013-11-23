@@ -20,6 +20,9 @@
 #include "G4LogicalVolumeStore.hh"
 #include "G4Material.hh"
 #include "G4Box.hh"
+#include "G4Paraboloid.hh"
+#include "G4SubtractionSolid.hh"
+#include "G4UnionSolid.hh"
 #include "G4Colour.hh"
 #include "G4Tubs.hh"
 #include "G4ThreeVector.hh"
@@ -42,12 +45,14 @@
 
 // Mu2e includes
 #include "G4Helper/inc/G4Helper.hh"
+#include "G4Helper/inc/VolumeInfo.hh"
 #include "Mu2eG4/inc/findMaterialOrThrow.hh"
 #include "GeomPrimitives/inc/TubsParams.hh"
 #include "GeomPrimitives/inc/PolyconsParams.hh"
 #include "Mu2eG4/inc/nestBox.hh"
 #include "Mu2eG4/inc/nestTubs.hh"
 #include "Mu2eG4/inc/nestPolycone.hh"
+#include "Mu2eG4/inc/finishNesting.hh"
 
 #include "MuCapG4/inc/MuCapSD.hh"
 #include "MuCapDataProducts/inc/WireCellId.hh"
@@ -57,6 +62,8 @@ namespace mucap {
   using namespace std;
   using namespace mu2e;
   using fhicl::ParameterSet;
+  using mu2e::VolumeInfo;
+  using CLHEP::Hep3Vector;
 
   void MuCapWorld::constructBeamline(const VolumeInfo& parent, const fhicl::ParameterSet& pset) {
     const double zmin = pset.get<double>("zmin");
@@ -157,20 +164,72 @@ namespace mucap {
              doSurfaceCheck_
              );
 
-    nestTubs("GabsVacuumWindow",
-             TubsParams(0., rVacWin, tVacWin/2),
-             findMaterialOrThrow(pset.get<string>("vacuum_window_material")),
-             0, // no rotation
-             CLHEP::Hep3Vector(0,0, zend - exitFoilThick - foilDistance - tVacWin/2) - parent.centerInWorld,
-             parent,
-             0,
-             pset.get<bool>("foil_visible"),
-             G4Colour::Blue(),
-             pset.get<bool>("foil_solid"),
-             forceAuxEdgeVisible_,
-             placePV_,
-             doSurfaceCheck_
-             );
+
+    const double bulge = pset.get<double>("vacuum_window_bulge");
+    if(bulge < 0.) {
+      throw cet::exception("GEOM")<<__func__<<" gabs.vacuum_window_bulge < 0\n";
+    }
+    else if(bulge > 0.) {
+      //----------------------------------------------------------------
+      // Bulged window and gas
+
+      CLHEP::Hep3Vector gasCenter(0,0, zend - exitFoilThick - foilDistance - bulge/2);
+      VolumeInfo bulgeGas("GabsBulgeGas", gasCenter - parent.centerInWorld, parent.centerInWorld);
+      bulgeGas.solid = new G4Paraboloid(bulgeGas.name, bulge/2, 0., rVacWin);
+
+      finishNesting(bulgeGas,
+                    findMaterialOrThrow(pset.get<string>("inside_material")),
+                    0, // no rotation
+                    bulgeGas.centerInParent,
+                    parent.logical,
+                    0,
+                    pset.get<bool>("gas_visible"),
+                    G4Colour::Yellow(),
+                    pset.get<bool>("gas_solid"),
+                    forceAuxEdgeVisible_,
+                    placePV_,
+                    doSurfaceCheck_
+                    );
+
+      G4Tubs* flat = new G4Tubs("vwflat", 0., rVacWin, tVacWin/2, 0., CLHEP::twopi);
+      G4UnionSolid* vwenvelope = new G4UnionSolid("vwenvelope", flat, bulgeGas.solid, 0, Hep3Vector(0,0,-bulge/2-tVacWin/2));
+
+      CLHEP::Hep3Vector flatCenter(0,0, zend - exitFoilThick - foilDistance - tVacWin/2);
+      VolumeInfo vacuumWindow("GabsVacuumWindow", flatCenter - parent.centerInWorld, parent.centerInWorld);
+      vacuumWindow.solid = new G4SubtractionSolid("GabsVacuumWindow", vwenvelope, bulgeGas.solid, 0, Hep3Vector(0,0,-bulge/2 + tVacWin/2));
+      finishNesting(vacuumWindow,
+                    findMaterialOrThrow(pset.get<string>("vacuum_window_material")),
+                    0, // no rotation
+                    vacuumWindow.centerInParent,
+                    parent.logical,
+                    0,
+                    pset.get<bool>("foil_visible"),
+                    G4Colour::Blue(),
+                    pset.get<bool>("foil_solid"),
+                    forceAuxEdgeVisible_,
+                    placePV_,
+                    doSurfaceCheck_
+                    );
+    }
+    else {
+      //----------------------------------------------------------------
+      // Flat window
+
+      nestTubs("GabsVacuumWindow",
+               TubsParams(0., rVacWin, tVacWin/2),
+               findMaterialOrThrow(pset.get<string>("vacuum_window_material")),
+               0, // no rotation
+               CLHEP::Hep3Vector(0,0, zend - exitFoilThick - foilDistance - tVacWin/2) - parent.centerInWorld,
+               parent,
+               0,
+               pset.get<bool>("foil_visible"),
+               G4Colour::Blue(),
+               pset.get<bool>("foil_solid"),
+               forceAuxEdgeVisible_,
+               placePV_,
+               doSurfaceCheck_
+               );
+    }
 
     //----------------
     CLHEP::Hep3Vector  bulkGasRefPoint(0,0,0);

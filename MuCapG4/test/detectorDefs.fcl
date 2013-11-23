@@ -263,8 +263,8 @@ chamberModules00061 : [
 //================================================================
 mucapGeometry : {
     forceAuxEdgeVisible : true
-    doSurfaceCheck : false
-    writeGDML : false
+    doSurfaceCheck : true
+    writeGDML : true
 
     world : {
         halfLength : [ 4500, 4500, 4500] // as in TWIST G3
@@ -328,6 +328,8 @@ mucapGeometry : {
             vacuum_window_thickness: 0.093 // mm, measured
             vacuum_window_radius: 50.8
             vacuum_window_material: "G4_KAPTON" // NB: G3 uses Mylar here
+
+	    vacuum_window_bulge: 10. // mm, non-negative
 
             foilToFoilNominalDistance: 204. // mm, gas between (non-bulging) vacuum window and the downstream foil
             
