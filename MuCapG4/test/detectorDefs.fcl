@@ -278,70 +278,114 @@ mucapGeometry : {
     // Detector He enclosure. Follow G3's extra_geom.par, convert cm to mm
     hous : {
         hous_radius: 514.8834   // the outer radius of the enclosure, including the wall
-	hous_length: 1495.2980  // the length of the outer wall (the cylinder) between the covers
-	hous_cover: 76.2  // the length of the cover
-	hous_mantle: 2.3876  // the thickness of the cylinder wall
+        hous_length: 1495.2980  // the length of the outer wall (the cylinder) between the covers
+        hous_cover: 76.2  // the length of the cover
+        hous_mantle: 2.3876  // the thickness of the cylinder wall
 
-	foil_thickness: 0.00635    // qrt_thou
-	hent_radius_1: 170.053     // hole in the cover, on the He/N2 side of the foil
-	hent_length_1: 28.197175   // He/N2 side cover edge to foil distance + foil thickness
-	hent_radius_2: 195.453     // hole in the cover, on the air side of the foil
-	hent_flunsh: 6.35 // the length of a retaining ring, r1 to r2 flush to the step between the radii
+        foil_thickness: 0.00635    // qrt_thou
+        hent_radius_1: 170.053     // hole in the cover, on the He/N2 side of the foil
+        hent_length_1: 28.197175   // He/N2 side cover edge to foil distance + foil thickness
+        hent_radius_2: 195.453     // hole in the cover, on the air side of the foil
+        hent_flunsh: 6.35 // the length of a retaining ring, r1 to r2 flush to the step between the radii
 
         hous_inside_material: "MUCAP_CRADLE_GAS"
         hous_wall_material: "G4_Al"
-	hous_foil_material: "G4_MYLAR"
+        hous_foil_material: "G4_MYLAR"
         hous_outside_material: "G4_AIR"
 
-	hous_visible: false
-	hous_solid: false
-	hous_wall_visible: true
-	hous_wall_solid: false
-	hous_foil_visible: true
-	hous_foil_solid: true
+        hous_visible: false
+        hous_solid: false
+        hous_wall_visible: true
+        hous_wall_solid: false
+        hous_foil_visible: true
+        hous_foil_solid: true
+    }
+
+    beamline: {
+        zmin: -4500 // start at the world boundary
+
+        gabs_zend: -827.65 // the downstream face of "WIN4" 
+        gabs_outer_radius:  76.25 // mm, same for the beam pipe it is attached to
+        gabs_outer_length: 216.7 // mm
+
+        vacuum_material: G4_Galactic
+        vacuum_visible: false
+        vacuum_solid: false     
+
+        wall_thickness: 3.2 // mm
+        wall_material: G4_Al
+        wall_visible: true
+        wall_solid: true
+        
+        gabs: {
+            wall_thickness: 3.2 // mm
+            vacuum_holder_thickness: 19.05 //
+            wall_material: "G4_Al"
+
+            exit_foil_thickness: 0.00635 // mm = qrt_thou
+            exit_foil_material: "G4_MYLAR"
+
+            vacuum_window_thickness: 0.093 // mm, measured
+            vacuum_window_radius: 50.8
+            vacuum_window_material: "G4_KAPTON" // NB: G3 uses Mylar here
+
+            foilToFoilNominalDistance: 204. // mm, gas between (non-bulging) vacuum window and the downstream foil
+            
+            inside_material: "MUCAP_GABS_GAS"
+
+            gas_visible: true
+            gas_solid: true
+            wall_visible: true
+            wall_solid: true
+            foil_visible: true
+            foil_solid: true
+        }
+
+
+
     }
 
     scintillators : {
-	rIn: [ 0., 30., 30., 0., 0.]
-	rOut: [ 30., 185., 185., 215., 216. ]
-	thick: [  0.239, 6.350, 6.350,  3.175,  3.175 ]
+        rIn: [ 0., 30., 30., 0., 0.]
+        rOut: [ 30., 185., 185., 215., 216. ]
+        thick: [  0.239, 6.350, 6.350,  3.175,  3.175 ]
 
-	// It looks like G3 offset mu scints (but not t0 scints) from
-	// the geometry file position by the wrapping thickness.  G4 code
-	// does not do that.   One can adjust the zcenter numbers below
-	// to reproduce the exact G3 positions.  At the moment the numbers
-	// are straight from dt_geo.00066 converted to mm, without the adjustment.
+        // It looks like G3 offset mu scints (but not t0 scints) from
+        // the geometry file position by the wrapping thickness.  G4 code
+        // does not do that.   One can adjust the zcenter numbers below
+        // to reproduce the exact G3 positions.  At the moment the numbers
+        // are straight from dt_geo.00066 converted to mm, without the adjustment.
 
-	// Notes:
-	//
-	// 1) the muon counter in G3 is placed in HEBG.  The -80.8735 cm
-	// z position specified  in dt_geo.00066 is ignored, and instead
+        // Notes:
+        //
+        // 1) the muon counter in G3 is placed in HEBG.  The -80.8735 cm
+        // z position specified  in dt_geo.00066 is ignored, and instead
         // the counter+wrapping is placed flush at the HEBG end, inside,
-	// at global z=-80.8751176 cm.  In G4 we always place it at the
-	// specified zcenter position.
-	//
-	// 2) The upstream t0 counters in G3 are at -80.5435 and -79.9085.
-	// This leaves no room for the wrapping, which is not in G3.
-	// Since we wrap all scintillators, a t0 counter is moved here by
-	// twice the total wrap thickness from -805.435 mm to -805.47828 mm.
-	
-	zcenter: [ -808.735, -805.47828, -799.085, 1502., 1507. ]
+        // at global z=-80.8751176 cm.  In G4 we always place it at the
+        // specified zcenter position.
+        //
+        // 2) The upstream t0 counters in G3 are at -80.5435 and -79.9085.
+        // This leaves no room for the wrapping, which is not in G3.
+        // Since we wrap all scintillators, a t0 counter is moved here by
+        // twice the total wrap thickness from -805.435 mm to -805.47828 mm.
+        
+        zcenter: [ -808.735, -805.47828, -799.085, 1502., 1507. ]
 
-	// The material for (at least some of) the scintillators is BC408,
-	// which is based on polyvinyltoluene.  The G4 standard plastic
-	// has the same density 1.032 g/cm3 as what TWIST G3 uses,
-	// and a similar, but not the same C:H ratio
+        // The material for the scintillators (at least the upstream package) is BC408,
+        // which is based on polyvinyltoluene.  The G4 standard plastic
+        // has the same density 1.032 g/cm3 as what TWIST G3 uses,
+        // and a similar, but not the same C:H ratio
         scint_material: "G4_PLASTIC_SC_VINYLTOLUENE"
 
-	// From inside out:
-	wrap_materials: [ "G4_Al", "G4_MYLAR" ]
-	wrap_thicknesses: [ 0.01082, 0.01082 ] // G3:  0.002164 cm, split equally between Al and Mylar
+        // From inside out:
+        wrap_materials: [ "G4_Al", "G4_MYLAR" ]
+        wrap_thicknesses: [ 0.01082, 0.01082 ] // G3:  0.002164 cm, split equally between Al and Mylar
 
-	scint_visible: true
-	scint_solid: true
+        scint_visible: true
+        scint_solid: true
 
-	wrap_visible: true
-	wrap_solid: true
+        wrap_visible: true
+        wrap_solid: true
     }
 
     cellSD : {
