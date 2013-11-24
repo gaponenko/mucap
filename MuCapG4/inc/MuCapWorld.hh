@@ -30,6 +30,7 @@ namespace mucap {
     void constructBeamline(const mu2e::VolumeInfo& parent, const fhicl::ParameterSet& pset);
 
     void constructGasDegrader(const mu2e::VolumeInfo& vacuumParent, double zend, double rOut, double lOut, const fhicl::ParameterSet& pset);
+    void constructTEC(const mu2e::VolumeInfo& parent, double rOut, const fhicl::ParameterSet& pset);
 
     // Returns the number of planes in the module
     unsigned constructChamberModule(unsigned moduleNumber,

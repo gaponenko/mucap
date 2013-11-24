@@ -23,6 +23,7 @@ namespace mucap {
 
     int ncomp=0, natoms=0;
 
+    const double P_STP = pset_.get<double>("P_STP");
     const double temperature0 = 273.15;
     const double absDetectorTemperature =  temperature0 + pset_.get<double>("TCelsius");
     const double gasDensityFactorFrom15C = (15 + temperature0)/absDetectorTemperature;
@@ -43,6 +44,17 @@ namespace mucap {
     dme->AddElement(getElementOrThrow("O"), natoms=1);
     dme->AddElement(getElementOrThrow("C"), natoms=2);
     dme->AddElement(getElementOrThrow("H"), natoms=6);
+
+    //----------------------------------------------------------------
+    G4Material *tec_dme =
+      new G4Material("MUCAP_TEC_GAS",
+                     (pset_.get<double>("tecGasPressure")/P_STP)*
+                     dme_density_at_15C * gasDensityFactorFrom15C,
+                     ncomp=3);
+
+    tec_dme->AddElement(getElementOrThrow("O"), natoms=1);
+    tec_dme->AddElement(getElementOrThrow("C"), natoms=2);
+    tec_dme->AddElement(getElementOrThrow("H"), natoms=6);
 
     //----------------------------------------------------------------
     const double isobutane_density_at_15C = 2.51 * mg/cm3;

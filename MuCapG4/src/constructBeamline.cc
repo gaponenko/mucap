@@ -108,6 +108,7 @@ namespace mucap {
              );
     
     constructGasDegrader(vac, zend, gabs_rOut, gabs_length, pset.get<ParameterSet>("gabs"));
+    constructTEC(vac, bpipe_params.innerRadius(), pset.get<ParameterSet>("tec"));
   }
 
   //================================================================
@@ -259,6 +260,62 @@ namespace mucap {
 
 
     
+  }
+
+  //================================================================
+  void MuCapWorld::constructTEC(const VolumeInfo& parent, double rOut, const fhicl::ParameterSet& pset) {
+    if(pset.get<bool>("installed")) {
+      const double halfLength = pset.get<double>("length")/2;
+      const VolumeInfo gas = nestTubs("TECGas",
+                                      TubsParams(0., rOut, halfLength),
+                                      findMaterialOrThrow(pset.get<string>("gas_material")),
+                                      0, // no rotation
+                                      Hep3Vector(0,0, pset.get<double>("center_z")) - parent.centerInWorld,
+                                      parent,
+                                      0,
+                                      pset.get<bool>("gas_visible"),
+                                      G4Colour::Yellow(),
+                                      pset.get<bool>("gas_solid"),
+                                      forceAuxEdgeVisible_,
+                                      placePV_,
+                                      doSurfaceCheck_
+                                      );
+
+      //----------------
+      const double foilHalfThick(pset.get<double>("foil_thickness")/2);
+      TubsParams foilParams(0., rOut, foilHalfThick);
+
+      nestTubs("TECFoilUp",
+               foilParams,
+               findMaterialOrThrow(pset.get<string>("foil_material")),
+               0, // no rotation
+               Hep3Vector(0,0, -(halfLength-foilHalfThick)),
+               gas,
+               0,
+               pset.get<bool>("foil_visible"),
+               G4Colour::Yellow(),
+               pset.get<bool>("foil_solid"),
+               forceAuxEdgeVisible_,
+               placePV_,
+               doSurfaceCheck_
+               );
+
+      nestTubs("TECFoilDn",
+               foilParams,
+               findMaterialOrThrow(pset.get<string>("foil_material")),
+               0, // no rotation
+               Hep3Vector(0,0, +(halfLength-foilHalfThick)),
+               gas,
+               0,
+               pset.get<bool>("foil_visible"),
+               G4Colour::Yellow(),
+               pset.get<bool>("foil_solid"),
+               forceAuxEdgeVisible_,
+               placePV_,
+               doSurfaceCheck_
+               );
+
+    }
   }
 
   //================================================================

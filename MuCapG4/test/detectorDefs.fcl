@@ -6,10 +6,12 @@ BEGIN_PROLOG
 
 //================================================================
 mucapMaterials : {
+    P_STP: 760 // standard pressure, Torr
     TCelsius : 20
     pcGasCF4VolumeFraction : 0.8
     cradleGasN2VolumeFraction : 0.03
     gabsGasCO2VolumeFraction : 0.43
+    tecGasPressure: 60 // Torr
     printElements : false
     printMaterials : false
 }
@@ -263,8 +265,8 @@ chamberModules00061 : [
 //================================================================
 mucapGeometry : {
     forceAuxEdgeVisible : true
-    doSurfaceCheck : true
-    writeGDML : true
+    doSurfaceCheck : false
+    writeGDML : false
 
     world : {
         halfLength : [ 4500, 4500, 4500] // as in TWIST G3
@@ -343,7 +345,21 @@ mucapGeometry : {
             foil_solid: true
         }
 
+        tec: {
+	    installed: true
 
+	    center_z: -1919.44 // tec_postn from dt_geo.00066
+	    length: 270. // derived from distance between end foils from G3 printout
+
+	    foil_material: G4_MYLAR
+	    foil_thickness: 0.00635 // mm = qrt_thou
+	    foil_visible: true
+	    foil_solid: true
+
+	    gas_material: MUCAP_TEC_GAS
+	    gas_visible: false
+	    gas_solid: false
+        }
 
     }
 
