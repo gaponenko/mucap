@@ -331,7 +331,7 @@ mucapGeometry : {
             vacuum_window_radius: 50.8
             vacuum_window_material: "G4_KAPTON" // NB: G3 uses Mylar here
 
-	    vacuum_window_bulge: 10. // mm, non-negative
+            vacuum_window_bulge: 10. // mm, non-negative
 
             foilToFoilNominalDistance: 204. // mm, gas between (non-bulging) vacuum window and the downstream foil
             
@@ -346,21 +346,32 @@ mucapGeometry : {
         }
 
         tec: {
-	    installed: true
+            installed: true
 
-	    center_z: -1919.44 // tec_postn from dt_geo.00066
-	    length: 270. // derived from distance between end foils from G3 printout
+            center_z: -1919.44 // tec_postn from dt_geo.00066
+            length: 270. // derived from distance between end foils from G3 printout
 
-	    foil_material: G4_MYLAR
-	    foil_thickness: 0.00635 // mm = qrt_thou
-	    foil_visible: true
-	    foil_solid: true
+            foil_material: G4_MYLAR
+            foil_thickness: 0.00635 // mm = qrt_thou
+            foil_visible: true
+            foil_solid: true
 
-	    gas_material: MUCAP_TEC_GAS
-	    gas_visible: false
-	    gas_solid: false
+            gas_material: MUCAP_TEC_GAS
+            gas_visible: false
+            gas_solid: false
+
+            // module length 80 mm (NIMA), inter-module gap 40 mm (dt_geo.00066)
+            field_plane_zoffset: [-100, -20, +20, +100]
+
+            // degrees, 0 means the field wires are horizontal
+            field_plane_rotation: [0, 0, 90, 90]
+
+            field_wire_diameter: 0.050 // mm, dt_geo.00066
+            field_wire_pitch: 2.54 // mm, 2006.NIMA.566.p563
+            field_wire_material: G4_Cu // Cu/Be is >97% copper
+            field_wire_visible: true
+            field_wire_solid: true
         }
-
     }
 
     scintillators : {

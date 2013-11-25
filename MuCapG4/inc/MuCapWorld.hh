@@ -10,6 +10,8 @@
 #include "Mu2eG4/inc/Mu2eUniverse.hh"
 
 class G4VPhysicalVolume;
+class G4Material;
+class G4LogicalVolume;
 
 namespace mu2e { class VolumeInfo; }
 
@@ -31,6 +33,7 @@ namespace mucap {
 
     void constructGasDegrader(const mu2e::VolumeInfo& vacuumParent, double zend, double rOut, double lOut, const fhicl::ParameterSet& pset);
     void constructTEC(const mu2e::VolumeInfo& parent, double rOut, const fhicl::ParameterSet& pset);
+    G4LogicalVolume *makeTECFieldPlane(double radius, G4Material *gasMaterial, const fhicl::ParameterSet& pset);
 
     // Returns the number of planes in the module
     unsigned constructChamberModule(unsigned moduleNumber,

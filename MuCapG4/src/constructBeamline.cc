@@ -11,6 +11,7 @@
 
 #include "cetlib/exception.h"
 
+#include "CLHEP/Geometry/Transform3D.h"
 #include "CLHEP/Units/SystemOfUnits.h"
 
 #include "art/Framework/Services/Registry/ServiceHandle.h"
@@ -42,6 +43,7 @@
 #include "G4GDMLParser.hh"
 #include "G4UserLimits.hh"
 #include "G4SDManager.hh"
+#include "G4PVPlacement.hh"
 
 // Mu2e includes
 #include "G4Helper/inc/G4Helper.hh"
@@ -53,6 +55,7 @@
 #include "Mu2eG4/inc/nestTubs.hh"
 #include "Mu2eG4/inc/nestPolycone.hh"
 #include "Mu2eG4/inc/finishNesting.hh"
+#include "G4Helper/inc/AntiLeakRegistry.hh"
 
 #include "MuCapG4/inc/MuCapSD.hh"
 #include "MuCapDataProducts/inc/WireCellId.hh"
@@ -266,9 +269,11 @@ namespace mucap {
   void MuCapWorld::constructTEC(const VolumeInfo& parent, double rOut, const fhicl::ParameterSet& pset) {
     if(pset.get<bool>("installed")) {
       const double halfLength = pset.get<double>("length")/2;
+
+      G4Material *gasMaterial = findMaterialOrThrow(pset.get<string>("gas_material"));
       const VolumeInfo gas = nestTubs("TECGas",
                                       TubsParams(0., rOut, halfLength),
-                                      findMaterialOrThrow(pset.get<string>("gas_material")),
+                                      gasMaterial,
                                       0, // no rotation
                                       Hep3Vector(0,0, pset.get<double>("center_z")) - parent.centerInWorld,
                                       parent,
@@ -315,7 +320,86 @@ namespace mucap {
                doSurfaceCheck_
                );
 
+      //----------------------------------------------------------------
+      // Place field wire planes
+      const vector<double> fwz = pset.get<vector<double> >("field_plane_zoffset");
+      const vector<double> fwr = pset.get<vector<double> >("field_plane_rotation");
+      if(fwz.size() != fwr.size()) {
+        throw cet::exception("GEOM")<<__func__
+                                    <<": field_plane_zoffset and field_plane_rotation must be of the same size\n";
+      }
+
+      G4LogicalVolume* fieldPlane = makeTECFieldPlane(rOut, gasMaterial, pset);
+      for(unsigned i=0; i<fwz.size(); ++i) {
+        std::ostringstream os;
+        os<<"TECFieldPlane"<<i;
+        new G4PVPlacement(HepGeom::RotateZ3D(fwr[i]*CLHEP::degree)*HepGeom::TranslateZ3D(fwz[i]),
+                          fieldPlane,
+                          os.str(),
+                          gas.logical,
+                          false,
+                          i,
+                          doSurfaceCheck_);
+      }
+
+      //----------------------------------------------------------------
+
     }
+  }
+
+  //================================================================
+  G4LogicalVolume *MuCapWorld::makeTECFieldPlane(double radius, G4Material *gasMaterial, const fhicl::ParameterSet& pset) {
+    const double wireRadius(pset.get<double>("field_wire_diameter")/2);
+    G4LogicalVolume *plane = new G4LogicalVolume(new G4Tubs("TECFieldPlane", 0, radius, wireRadius, 0, CLHEP::twopi),
+                                                 gasMaterial,
+                                                 "TECFieldPlane"
+                                                 );
+
+
+    AntiLeakRegistry& reg = art::ServiceHandle<G4Helper>()->antiLeakRegistry();
+    CLHEP::HepRotation *wireRotationInv = reg.add(new CLHEP::HepRotation());
+    wireRotationInv->rotateY(90*CLHEP::degree);
+    
+    G4Material *bronze = findMaterialOrThrow(pset.get<string>("field_wire_material"));
+    const double pitch = pset.get<double>("field_wire_pitch");
+    double offset =0;
+    for(int i=0; (offset = (0.5+i)*pitch) + wireRadius < radius; ++i) {
+      std::ostringstream os;
+      os<<"TECFieldWire"<<i;
+      const double halfLength = sqrt(std::pow(radius,2) - std::pow(offset + wireRadius, 2));
+
+      nestTubs(os.str()+"a",
+               TubsParams(0, wireRadius, halfLength),
+               bronze,
+               wireRotationInv,
+               Hep3Vector(0,offset,0),
+               plane,
+               0,
+               pset.get<bool>("field_wire_visible"),
+               G4Colour::Red(),
+               pset.get<bool>("field_wire_solid"),
+               forceAuxEdgeVisible_,
+               placePV_,
+               doSurfaceCheck_
+               );
+
+      nestTubs(os.str()+"b",
+               TubsParams(0, wireRadius, halfLength),
+               bronze,
+               wireRotationInv,
+               Hep3Vector(0,-offset,0),
+               plane,
+               0,
+               pset.get<bool>("field_wire_visible"),
+               G4Colour::Red(),
+               pset.get<bool>("field_wire_solid"),
+               forceAuxEdgeVisible_,
+               placePV_,
+               doSurfaceCheck_
+               );
+    }
+
+    return plane;
   }
 
   //================================================================
