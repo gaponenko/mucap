@@ -84,17 +84,9 @@ physics : {
             digiModuleLabel : "digitization"
             simParticlesModuleLabel : "g4run"
         }
-
-	simPrint : {
-	    //module_type: SimParticlesPrinter
-	    //printer: { prefix: mcPrimary  primariesOnly : true }
-	    module_type: MuCaptureProcessPrinter
-	    inputCollection: g4run
-	}
     }
 
     p1 : [generate, g4run, digitization]
-    //    e1 : [mcparticles, mchits, clarkdumper, simPrint]
     e1 : [mcparticles, mchits, clarkdumper]
 
     trigger_paths  : [p1]
