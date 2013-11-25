@@ -23,6 +23,7 @@
 #include "G4Box.hh"
 #include "G4Paraboloid.hh"
 #include "G4SubtractionSolid.hh"
+#include "G4IntersectionSolid.hh"
 #include "G4UnionSolid.hh"
 #include "G4Colour.hh"
 #include "G4Tubs.hh"
@@ -195,12 +196,20 @@ namespace mucap {
                     doSurfaceCheck_
                     );
 
-      G4Tubs* flat = new G4Tubs("vwflat", 0., rVacWin, tVacWin/2, 0., CLHEP::twopi);
-      G4UnionSolid* vwenvelope = new G4UnionSolid("vwenvelope", flat, bulgeGas.solid, 0, Hep3Vector(0,0,-bulge/2-tVacWin/2));
+      // Info for the bulged window
+      CLHEP::Hep3Vector winCenter(0,0, zend - exitFoilThick - foilDistance - (bulge + tVacWin)/2);
+      VolumeInfo vacuumWindow("GabsVacuumWindow", winCenter - parent.centerInWorld, parent.centerInWorld);
 
-      CLHEP::Hep3Vector flatCenter(0,0, zend - exitFoilThick - foilDistance - tVacWin/2);
-      VolumeInfo vacuumWindow("GabsVacuumWindow", flatCenter - parent.centerInWorld, parent.centerInWorld);
-      vacuumWindow.solid = new G4SubtractionSolid("GabsVacuumWindow", vwenvelope, bulgeGas.solid, 0, Hep3Vector(0,0,-bulge/2 + tVacWin/2));
+      // A taller (than the gas bulge) paraboloid following the same curve as the bulge.
+      G4Paraboloid* vwenvelope = new G4Paraboloid("vwenvelope", (bulge + tVacWin)/2, 0., rVacWin*sqrt(1 + tVacWin/bulge));
+
+      // This is the bulged foil, but it unwanted margins at radius > rVacWin
+      G4SubtractionSolid *vwsub = new G4SubtractionSolid("vwsub", vwenvelope, bulgeGas.solid, 0, Hep3Vector(0, 0, tVacWin/2));
+
+      // A cylinder to cut off the radial margins.  The precise length does not matter, just make it long enough.
+      G4Tubs* vwcut = new G4Tubs("vwcut", 0., rVacWin, tVacWin + bulge, 0., CLHEP::twopi);
+
+      vacuumWindow.solid = new G4IntersectionSolid("GabsVacuumWindow", vwsub, vwcut, 0, Hep3Vector(0,0,0));
       finishNesting(vacuumWindow,
                     findMaterialOrThrow(pset.get<string>("vacuum_window_material")),
                     0, // no rotation
