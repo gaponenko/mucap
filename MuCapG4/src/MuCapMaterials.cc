@@ -85,12 +85,14 @@ namespace mucap {
     G4Material *G4He = mu2e::findMaterialOrThrow("G4_He");
     G4Material *G4N2 = mu2e::findMaterialOrThrow("G4_N");
 
-    const double n2VolumeFraction = pset_.get<double>("cradleGasN2VolumeFraction");
-    const double n2MassFraction = n2VolumeFraction * G4N2->GetDensity()
-      /(n2VolumeFraction * G4N2->GetDensity() + (1-n2VolumeFraction)*G4He->GetDensity());
+    const double densityHe = G4He->GetDensity() * G4He->GetTemperature()/absDetectorTemperature;
+    const double densityN2 = G4N2->GetDensity() * G4N2->GetTemperature()/absDetectorTemperature;
 
-    const double cradleGasDensity =
-      n2VolumeFraction * G4N2->GetDensity() + (1-n2VolumeFraction)*G4He->GetDensity();
+    const double n2VolumeFraction = pset_.get<double>("cradleGasN2VolumeFraction");
+    const double n2MassFraction = n2VolumeFraction * densityN2
+      /(n2VolumeFraction * densityN2 + (1-n2VolumeFraction)*densityHe);
+
+    const double cradleGasDensity = n2VolumeFraction * densityN2 + (1-n2VolumeFraction)*densityHe;
 
     std::cout<<"MUCAP_CRADLE_GAS: N2 volume fraction = "<<n2VolumeFraction
              <<", mass fraction = "<<n2MassFraction
@@ -105,13 +107,13 @@ namespace mucap {
     //----------------------------------------------------------------
     G4Material *G4CO2 = mu2e::findMaterialOrThrow("G4_CARBON_DIOXIDE");
 
-    G4double densityCO2  = 0.00184 *g/cm3; //from PDG
+    G4double densityCO2  = G4CO2->GetDensity() * G4CO2->GetTemperature()/absDetectorTemperature;
     G4double co2VolumeFraction  = pset_.get<double>("gabsGasCO2VolumeFraction");
 
     const double co2MassFraction = co2VolumeFraction * densityCO2
-      /(co2VolumeFraction * densityCO2 + (1-co2VolumeFraction)*G4He->GetDensity());
+      /(co2VolumeFraction * densityCO2 + (1-co2VolumeFraction)*densityHe);
 
-    double gabs_density = co2VolumeFraction*densityCO2 + (1.0-co2VolumeFraction)*G4He->GetDensity();
+    double gabs_density = co2VolumeFraction*densityCO2 + (1.0-co2VolumeFraction)*densityHe;
 
     std::cout<<"MUCAP_GABS_GAS: CO2 volume fraction = "<<co2VolumeFraction
              <<", mass fraction = "<<co2MassFraction
