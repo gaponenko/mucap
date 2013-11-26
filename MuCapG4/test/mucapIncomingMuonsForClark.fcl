@@ -7,15 +7,15 @@ physics.producers.generate:  {
    energySpec : {
       variable: momentum
       spectrum: flat
-      center: 29.6
-      halfWidth: 0.1036 // 29.6 * 0.007/2
+      center: 29.2
+      halfWidth: 0.102 // 29.2 * 0.007/2
    }
    
    position : {
        shape : cylinder
        radius: 20 // mm
        halfdz: 0 //mm
-       position : [ 0, 0, -1054. ] // just before GABS
+       position : [ 0, 0, -2055. ] // just before TEC
    }
    
    angles : {
