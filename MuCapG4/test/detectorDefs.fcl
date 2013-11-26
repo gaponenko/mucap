@@ -7,7 +7,7 @@ BEGIN_PROLOG
 //================================================================
 mucapMaterials : {
     P_STP: 760 // standard pressure, Torr
-    TCelsius : 20
+    TCelsius : 31
     pcGasCF4VolumeFraction : 0.8
     cradleGasN2VolumeFraction : 0.03
     gabsGasCO2VolumeFraction : 0.43
