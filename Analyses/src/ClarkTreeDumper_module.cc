@@ -155,6 +155,8 @@ namespace mucap {
     //----------------
     TTree *nt_;
 
+    void addTruthParticle(const mu2e::SimParticle& particle);
+
   public:
     explicit ClarkTreeDumper(const fhicl::ParameterSet& pset);
     virtual void beginJob() override;
@@ -271,16 +273,26 @@ namespace mucap {
     event.getByLabel(simParticlesModuleLabel_, simParticlesInstanceName_, hparticles);
     const mu2e::SimParticleCollection& particles(*hparticles);
 
-    {
-      // Write out only the primary track (proton or DIO electron)
-      cet::map_vector_key iprim(1);
-      const mu2e::SimParticle primary(particles.getOrThrow(iprim));
+    nmctr = 0;
+    nmcvtx = 0;
 
-      nmctr = 0;
-      nmcvtx = 0;
+    // Write out the primary track
+    cet::map_vector_key iprim(1);
+    const mu2e::SimParticle primary(particles.getOrThrow(iprim));
 
-      mctrack_itrack[nmctr] = primary.id().asInt();
-      mctrack_pid[nmctr] = primary.pdgId();
+    addTruthParticle(primary);
+    for(const auto& p: primary.daughters()) {
+      addTruthParticle(*p);
+    }
+
+    //----------------------------------------------------------------
+    nt_->Fill();
+  }
+
+  //================================================================
+  void ClarkTreeDumper::addTruthParticle(const mu2e::SimParticle& particle) {
+      mctrack_itrack[nmctr] = particle.id().asInt();
+      mctrack_pid[nmctr] = particle.pdgId();
       mctrack_voff[nmctr] = nmcvtx;
 
       mctrack_nv[nmctr] = 2; // write out begin and end vertexes
@@ -289,34 +301,34 @@ namespace mucap {
       // Start vertex
 
       // Clark expects momenta in  MeV/c, this is what we have
-      mcvertex_ptot[nmcvtx] = primary.startMomentum().vect().mag();
-      mcvertex_costh[nmcvtx] = primary.startMomentum().vect().cosTheta();
-      mcvertex_phimuv[nmcvtx] = primary.startMomentum().vect().phi(); // FIXME: convert to UV
-      mcvertex_time[nmcvtx] = primary.startGlobalTime();
+      mcvertex_ptot[nmcvtx] = particle.startMomentum().vect().mag();
+      mcvertex_costh[nmcvtx] = particle.startMomentum().vect().cosTheta();
+      mcvertex_phimuv[nmcvtx] = particle.startMomentum().vect().phi(); // FIXME: convert to UV
+      mcvertex_time[nmcvtx] = particle.startGlobalTime();
 
       // FIXME: convert to UV
       // Convert mm to cm for Clark
-      mcvertex_vu[nmcvtx] = primary.startPosition().x()/10.;
-      mcvertex_vv[nmcvtx] = primary.startPosition().y()/10.;
-      mcvertex_vz[nmcvtx] = primary.startPosition().z()/10.;
+      mcvertex_vu[nmcvtx] = particle.startPosition().x()/10.;
+      mcvertex_vv[nmcvtx] = particle.startPosition().y()/10.;
+      mcvertex_vz[nmcvtx] = particle.startPosition().z()/10.;
 
-      mcvertex_istop[nmcvtx] = 0;
+      mcvertex_istop[nmcvtx] = particle.creationCode().id();
       
       ++nmcvtx;
 
       //----------------
       // Stop vertex
-      mcvertex_ptot[nmcvtx] = primary.endMomentum().vect().mag();
-      mcvertex_costh[nmcvtx] = primary.endMomentum().vect().cosTheta();
-      mcvertex_phimuv[nmcvtx] = primary.endMomentum().vect().phi();
-      mcvertex_time[nmcvtx] = primary.endGlobalTime();
+      mcvertex_ptot[nmcvtx] = particle.endMomentum().vect().mag();
+      mcvertex_costh[nmcvtx] = particle.endMomentum().vect().cosTheta();
+      mcvertex_phimuv[nmcvtx] = particle.endMomentum().vect().phi();
+      mcvertex_time[nmcvtx] = particle.endGlobalTime();
 
       // Convert mm to cm
-      mcvertex_vu[nmcvtx] = primary.endPosition().x()/10.;;
-      mcvertex_vv[nmcvtx] = primary.endPosition().y()/10.;;
-      mcvertex_vz[nmcvtx] = primary.endPosition().z()/10.;;
+      mcvertex_vu[nmcvtx] = particle.endPosition().x()/10.;;
+      mcvertex_vv[nmcvtx] = particle.endPosition().y()/10.;;
+      mcvertex_vz[nmcvtx] = particle.endPosition().z()/10.;;
 
-      mcvertex_istop[nmcvtx] = primary.stoppingCode().id();
+      mcvertex_istop[nmcvtx] = particle.stoppingCode().id();
       
       ++nmcvtx;
 
@@ -324,10 +336,6 @@ namespace mucap {
       // End of track processing
 
       ++nmctr;
-    }
-
-    //----------------------------------------------------------------
-    nt_->Fill();
   }
 
   //================================================================
