@@ -10,7 +10,7 @@ mucapMaterials : {
     TCelsius : 31
     pcGasCF4VolumeFraction : 0.8
     cradleGasN2VolumeFraction : 0.03
-    gabsGasCO2VolumeFraction : 0.43
+    gabsGasCO2VolumeFraction : 0.82
     tecGasPressure: 60 // Torr
     printElements : false
     printMaterials : false
