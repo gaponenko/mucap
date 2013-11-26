@@ -331,7 +331,7 @@ mucapGeometry : {
             vacuum_window_radius: 50.8
             vacuum_window_material: "G4_KAPTON" // NB: G3 uses Mylar here
 
-            vacuum_window_bulge: 10. // mm, non-negative
+            vacuum_window_bulge: 0. // mm, non-negative
 
             foilToFoilNominalDistance: 204. // mm, gas between (non-bulging) vacuum window and the downstream foil
             
