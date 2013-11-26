@@ -25,6 +25,7 @@
 #include "MuCapGenerator/inc/SpectrumGenFlat.hh"
 #include "MuCapGenerator/inc/SpectrumGenMECO.hh"
 #include "MuCapGenerator/inc/SpectrumGenExp.hh"
+#include "MuCapGenerator/inc/SpectrumGenGauss.hh"
 #include "MuCapGenerator/inc/SpectrumGenTabulated.hh"
 
 #include "MuCapUtilities/inc/mecoSpectrum.hh"
@@ -101,6 +102,13 @@ namespace mucap {
                             pset.get<double>("min", 0),
                             pset.get<double>("max", std::numeric_limits<double>::max()),
                             eng));
+    }
+    //----------------------------------------------------------------
+    else if(spectrum == "gauss") {
+      return std::unique_ptr<ISpectrumGenerator>
+        (new SpectrumGenGauss(pset.get<double>("mean"),
+                              pset.get<double>("sigma"),
+                              eng));
     }
     //----------------------------------------------------------------
     else if(spectrum == "tabulated") {
