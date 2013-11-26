@@ -126,6 +126,13 @@ namespace mucap {
     gabs_gas->AddMaterial(G4He, 1-co2MassFraction);
 
     //----------------------------------------------------------------
+    G4Material *G4_AIR = mu2e::findMaterialOrThrow("G4_AIR");
+    G4Material *MUCAP_AIR = new G4Material("MUCAP_AIR",
+                                           G4_AIR->GetDensity() * G4_AIR->GetTemperature()/absDetectorTemperature,
+                                           ncomp=1);
+    MUCAP_AIR->AddMaterial(G4_AIR, 1.);
+
+    //----------------------------------------------------------------
     // FR4 was sometimes referred to as "G10" in TWIST, but is a
     // different newer material.  This is a fiberglass-epoxy
     // composite.  For the lack of better information I'll use

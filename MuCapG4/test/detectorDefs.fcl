@@ -270,7 +270,7 @@ mucapGeometry : {
 
     world : {
         halfLength : [ 4500, 4500, 4500] // as in TWIST G3
-        material : "G4_AIR"
+        material : "MUCAP_AIR"
         BFieldInTesla : 2.0
         maxG4StepLength : 1 // mm, for visualization
         visible : false
@@ -293,7 +293,7 @@ mucapGeometry : {
         hous_inside_material: "MUCAP_CRADLE_GAS"
         hous_wall_material: "G4_Al"
         hous_foil_material: "G4_MYLAR"
-        hous_outside_material: "G4_AIR"
+        hous_outside_material: "MUCAP_AIR"
 
         hous_visible: false
         hous_solid: false
