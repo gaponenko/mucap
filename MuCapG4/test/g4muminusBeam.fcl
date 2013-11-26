@@ -32,19 +32,19 @@ physics.producers.generate:  {
    histograms : {
        kineticEnergy : {
            xmin : 0
-           xmax : 100
+           xmax : 50
            nbins : 500
        }
        momentum : {
-           xmin : 0
-           xmax : 500
+           xmin : 20
+           xmax : 40
            nbins : 500
        }
    }
 }
 
-process_name : mucapFlatProtonsForClark
-services.TFileService.fileName : "hist_mucapIncomingMuonsForClark.root"
+process_name : g4muminusBeam
+services.TFileService.fileName : "hist_g4muminusBeam.root"
 
 // This tells emacs to view this file in the JavaScript mode.
 // Local Variables:
