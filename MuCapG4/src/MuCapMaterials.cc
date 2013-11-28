@@ -32,6 +32,8 @@ namespace mucap {
     const double gasDensityFactorFrom15C = ((15 + temperature0)/absDetectorTemperature) * (pressureDetector/P_STP);
 
     //----------------------------------------------------------------
+    // http://encyclopedia.airliquide.com/Encyclopedia.asp?GasID=61
+    // at 1.013 bar
     const double cf4_density_at_15C = 3.72 * mg/cm3;
     G4Material *cf4 =
       new G4Material("MUCAP_CF4", cf4_density_at_15C * gasDensityFactorFrom15C, ncomp=2,
@@ -41,7 +43,9 @@ namespace mucap {
     cf4->AddElement(getElementOrThrow("F"), natoms=4);
 
     //----------------------------------------------------------------
-    const double dme_density_at_15C = 1.97 * mg/cm3;
+    // http://encyclopedia.airliquide.com/Encyclopedia.asp?GasID=80
+    // at 1.013 bar
+    const double dme_density_at_15C = 1.993 * mg/cm3;
     G4Material *dme =
       new G4Material("MUCAP_DME", dme_density_at_15C * gasDensityFactorFrom15C, ncomp=3,
                      kStateGas, absDetectorTemperature, pressureDetector);
@@ -61,7 +65,9 @@ namespace mucap {
     tec_dme->AddElement(getElementOrThrow("H"), natoms=6);
 
     //----------------------------------------------------------------
-    const double isobutane_density_at_15C = 2.51 * mg/cm3;
+    // http://encyclopedia.airliquide.com/Encyclopedia.asp?GasID=38
+    // at 1.013 bar
+    const double isobutane_density_at_15C = 2.5326 * mg/cm3;
     G4Material *isobutane =
       new G4Material("MUCAP_ISOBUTANE", isobutane_density_at_15C * gasDensityFactorFrom15C, ncomp=2,
                      kStateGas, absDetectorTemperature, pressureDetector);
