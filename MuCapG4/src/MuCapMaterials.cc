@@ -34,7 +34,8 @@ namespace mucap {
     //----------------------------------------------------------------
     const double cf4_density_at_15C = 3.72 * mg/cm3;
     G4Material *cf4 =
-      new G4Material("MUCAP_CF4", cf4_density_at_15C * gasDensityFactorFrom15C, ncomp=2);
+      new G4Material("MUCAP_CF4", cf4_density_at_15C * gasDensityFactorFrom15C, ncomp=2,
+                     kStateGas, absDetectorTemperature, pressureDetector);
 
     cf4->AddElement(getElementOrThrow("C"), natoms=1);
     cf4->AddElement(getElementOrThrow("F"), natoms=4);
@@ -42,7 +43,8 @@ namespace mucap {
     //----------------------------------------------------------------
     const double dme_density_at_15C = 1.97 * mg/cm3;
     G4Material *dme =
-      new G4Material("MUCAP_DME", dme_density_at_15C * gasDensityFactorFrom15C, ncomp=3);
+      new G4Material("MUCAP_DME", dme_density_at_15C * gasDensityFactorFrom15C, ncomp=3,
+                     kStateGas, absDetectorTemperature, pressureDetector);
 
     dme->AddElement(getElementOrThrow("O"), natoms=1);
     dme->AddElement(getElementOrThrow("C"), natoms=2);
@@ -52,7 +54,7 @@ namespace mucap {
     G4Material *tec_dme =
       new G4Material("MUCAP_TEC_GAS",
                      dme_density_at_15C *((15 + temperature0)/absDetectorTemperature)*(pressureTEC/P_STP),
-                     ncomp=3);
+                     ncomp=3, kStateGas, absDetectorTemperature, pressureTEC);
 
     tec_dme->AddElement(getElementOrThrow("O"), natoms=1);
     tec_dme->AddElement(getElementOrThrow("C"), natoms=2);
@@ -61,7 +63,8 @@ namespace mucap {
     //----------------------------------------------------------------
     const double isobutane_density_at_15C = 2.51 * mg/cm3;
     G4Material *isobutane =
-      new G4Material("MUCAP_ISOBUTANE", isobutane_density_at_15C * gasDensityFactorFrom15C, ncomp=2);
+      new G4Material("MUCAP_ISOBUTANE", isobutane_density_at_15C * gasDensityFactorFrom15C, ncomp=2,
+                     kStateGas, absDetectorTemperature, pressureDetector);
 
     isobutane->AddElement(getElementOrThrow("C"), natoms=4);
     isobutane->AddElement(getElementOrThrow("H"), natoms=10);
@@ -78,7 +81,8 @@ namespace mucap {
              <<", mass fraction = "<<cf4MassFraction
              <<", density = "<<(pcGasDensity)/(mg/cm3)<<" mg/cm3"<<std::endl;
 
-    G4Material *pcgas = new G4Material("MUCAP_PC_GAS", pcGasDensity, ncomp=2);
+    G4Material *pcgas = new G4Material("MUCAP_PC_GAS", pcGasDensity, ncomp=2,
+                                       kStateGas, absDetectorTemperature, pressureDetector);
 
     pcgas->AddMaterial(cf4, cf4MassFraction);
     pcgas->AddMaterial(isobutane, (1-cf4MassFraction));
@@ -108,7 +112,8 @@ namespace mucap {
              <<", density = "<<(cradleGasDensity)/(mg/cm3)
              <<" mg/cm3"<<std::endl;
 
-    G4Material *cradlegas = new G4Material("MUCAP_CRADLE_GAS", cradleGasDensity, ncomp=2);
+    G4Material *cradlegas = new G4Material("MUCAP_CRADLE_GAS", cradleGasDensity, ncomp=2,
+                                           kStateGas, absDetectorTemperature, pressureDetector);
 
     cradlegas->AddMaterial(G4N2, n2MassFraction);
     cradlegas->AddMaterial(G4He, 1-n2MassFraction);
@@ -133,7 +138,8 @@ namespace mucap {
              <<", density = "<<(gabs_density)/(mg/cm3)
              <<" mg/cm3"<<std::endl;
 
-    G4Material *gabs_gas = new G4Material("MUCAP_GABS_GAS", gabs_density, ncomp=2);
+    G4Material *gabs_gas = new G4Material("MUCAP_GABS_GAS", gabs_density, ncomp=2,
+                                          kStateGas, absDetectorTemperature, pressureDetector);
 
     gabs_gas->AddMaterial(G4CO2, co2MassFraction);
     gabs_gas->AddMaterial(G4He, 1-co2MassFraction);
@@ -145,9 +151,10 @@ namespace mucap {
       (G4_AIR->GetTemperature()/absDetectorTemperature) *
       (pressureDetector/G4_AIR->GetPressure());
 
-    G4Material *MUCAP_AIR = new G4Material("MUCAP_AIR",
-                                           densityAir,
-                                           ncomp=1);
+    G4Material *MUCAP_AIR =
+      new G4Material("MUCAP_AIR", densityAir, ncomp=1,
+                     kStateGas, absDetectorTemperature, pressureDetector);
+
     MUCAP_AIR->AddMaterial(G4_AIR, 1.);
 
     //----------------------------------------------------------------
