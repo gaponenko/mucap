@@ -6,8 +6,9 @@ BEGIN_PROLOG
 
 //================================================================
 mucapMaterials : {
-    P_STP: 760 // standard pressure, Torr
-    TCelsius : 31
+    // History plots: https://twist.triumf.ca/~e614/forum/view.php?site=twist&bn=twist_physics&key=1385659065
+    PTorr: 750 // To match G3. History value ~752.5 Torr
+    TCelsius : 31 // to match G3. History value ~26.5 C
     pcGasCF4VolumeFraction : 0.8
     cradleGasN2VolumeFraction : 0.03
     gabsGasCO2VolumeFraction : 0.82

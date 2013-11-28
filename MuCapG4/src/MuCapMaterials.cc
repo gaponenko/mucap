@@ -23,10 +23,13 @@ namespace mucap {
 
     int ncomp=0, natoms=0;
 
-    const double P_STP = pset_.get<double>("P_STP");
+    const double Torr = CLHEP::atmosphere/760;
+    const double P_STP = 760 * Torr;
+    const double pressureDetector = pset_.get<double>("PTorr") * Torr;
+    const double pressureTEC = pset_.get<double>("tecGasPressure") * Torr;
     const double temperature0 = 273.15;
     const double absDetectorTemperature =  temperature0 + pset_.get<double>("TCelsius");
-    const double gasDensityFactorFrom15C = (15 + temperature0)/absDetectorTemperature;
+    const double gasDensityFactorFrom15C = ((15 + temperature0)/absDetectorTemperature) * (pressureDetector/P_STP);
 
     //----------------------------------------------------------------
     const double cf4_density_at_15C = 3.72 * mg/cm3;
@@ -48,8 +51,7 @@ namespace mucap {
     //----------------------------------------------------------------
     G4Material *tec_dme =
       new G4Material("MUCAP_TEC_GAS",
-                     (pset_.get<double>("tecGasPressure")/P_STP)*
-                     dme_density_at_15C * gasDensityFactorFrom15C,
+                     dme_density_at_15C *((15 + temperature0)/absDetectorTemperature)*(pressureTEC/P_STP),
                      ncomp=3);
 
     tec_dme->AddElement(getElementOrThrow("O"), natoms=1);
@@ -85,8 +87,15 @@ namespace mucap {
     G4Material *G4He = mu2e::findMaterialOrThrow("G4_He");
     G4Material *G4N2 = mu2e::findMaterialOrThrow("G4_N");
 
-    const double densityHe = G4He->GetDensity() * G4He->GetTemperature()/absDetectorTemperature;
-    const double densityN2 = G4N2->GetDensity() * G4N2->GetTemperature()/absDetectorTemperature;
+    const double densityHe = G4He->GetDensity() *
+      (G4He->GetTemperature()/absDetectorTemperature) *
+      (pressureDetector/G4He->GetPressure())
+      ;
+
+    const double densityN2 = G4N2->GetDensity() *
+      (G4N2->GetTemperature()/absDetectorTemperature) *
+      (pressureDetector/G4N2->GetPressure())
+      ;
 
     const double n2VolumeFraction = pset_.get<double>("cradleGasN2VolumeFraction");
     const double n2MassFraction = n2VolumeFraction * densityN2
@@ -107,7 +116,11 @@ namespace mucap {
     //----------------------------------------------------------------
     G4Material *G4CO2 = mu2e::findMaterialOrThrow("G4_CARBON_DIOXIDE");
 
-    G4double densityCO2  = G4CO2->GetDensity() * G4CO2->GetTemperature()/absDetectorTemperature;
+    G4double densityCO2  = G4CO2->GetDensity() *
+      (G4CO2->GetTemperature()/absDetectorTemperature) *
+      (pressureDetector/G4CO2->GetPressure())
+      ;
+
     G4double co2VolumeFraction  = pset_.get<double>("gabsGasCO2VolumeFraction");
 
     const double co2MassFraction = co2VolumeFraction * densityCO2
@@ -127,8 +140,13 @@ namespace mucap {
 
     //----------------------------------------------------------------
     G4Material *G4_AIR = mu2e::findMaterialOrThrow("G4_AIR");
+
+    const double densityAir = G4_AIR->GetDensity() * 
+      (G4_AIR->GetTemperature()/absDetectorTemperature) *
+      (pressureDetector/G4_AIR->GetPressure());
+
     G4Material *MUCAP_AIR = new G4Material("MUCAP_AIR",
-                                           G4_AIR->GetDensity() * G4_AIR->GetTemperature()/absDetectorTemperature,
+                                           densityAir,
                                            ncomp=1);
     MUCAP_AIR->AddMaterial(G4_AIR, 1.);
 
