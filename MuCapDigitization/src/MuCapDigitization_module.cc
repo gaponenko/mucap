@@ -49,6 +49,8 @@ namespace mucap {
     std::string particlesInstanceName_;
     double minTimeWidthDC_;
     double minTimeWidthPC_;
+    double daqGateTimeMin_;
+    double daqGateTimeMax_;
 
     art::ServiceHandle<Geometry> geom_;
 
@@ -76,6 +78,8 @@ namespace mucap {
 
     , minTimeWidthDC_(pset.get<double>("minHitTimeSepDC"))
     , minTimeWidthPC_(pset.get<double>("minHitTimeSepPC"))
+    , daqGateTimeMin_(pset.get<double>("daqGateTimeMin"))
+    , daqGateTimeMax_(pset.get<double>("daqGateTimeMax"))
 
     , hnumSimHitsPerChannelDC_(nullptr)
     , hsimHitTimeSepDC_(nullptr)
@@ -151,7 +155,9 @@ namespace mucap {
         }
         hnum->Fill(numSimHits);
 
-        out->emplace_back(rid, tstart, (t-tstart)+tcut);
+        if((daqGateTimeMin_ <= tstart) && (tstart < daqGateTimeMax_)) {
+          out->emplace_back(rid, tstart, (t-tstart)+tcut);
+        }
       }
     }
   }

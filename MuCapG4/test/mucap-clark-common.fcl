@@ -59,6 +59,8 @@ physics : {
             particlesModuleLabel : "g4run"
             minHitTimeSepPC : 50
             minHitTimeSepDC : 100
+            daqGateTimeMin : -6000
+            daqGateTimeMax : 10000
 	}
     }
 
