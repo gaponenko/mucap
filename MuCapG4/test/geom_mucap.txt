@@ -6,7 +6,7 @@ bool mu2e.standardDetector = false;
 bool mu2e.printParticleDataTable = false;
 
 // Use a decent physics list
-string g4.physicsListName      = "QGSP_BERT";
+string g4.physicsListName      = "Shielding_MU2E00";
 bool g4.printPhysicsProcessSummary = true;
 double g4.minRangeCut     = 0.010;            // mm
 
