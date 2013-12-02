@@ -6,9 +6,9 @@ physics.producers.generate:  {
    pdgId : +13 // muminus
    energySpec : {
       variable: momentum
-      spectrum: flat
-      center: 29.2
-      halfWidth: 0.102 // 29.2 * 0.007/2
+      spectrum: gauss
+      mean: 30.1
+      sigma: 0.25
    }
    
    position : {
@@ -36,15 +36,15 @@ physics.producers.generate:  {
            nbins : 500
        }
        momentum : {
-           xmin : 20
-           xmax : 40
-           nbins : 500
+           xmin : 28
+           xmax : 33
+           nbins : 1000
        }
    }
 }
 
-process_name : g4muminusBeam
-services.TFileService.fileName : "hist_g4muminusBeam.root"
+process_name : g4beam
+services.TFileService.fileName : "hist_g4beam.root"
 
 // This tells emacs to view this file in the JavaScript mode.
 // Local Variables:
