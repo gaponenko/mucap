@@ -12,7 +12,7 @@ my $clark = '/home/andr/Clark/Clark';
 
 sub usage() {
     return "
-Usage: stopdist.pl g4template.fcl clark_config {flat|gauss} momentum frac_width
+Usage: stopdist.pl g4template.fcl clark_config {flat|gauss} momentum widthParameter
 
 ";
 }
@@ -20,10 +20,9 @@ Usage: stopdist.pl g4template.fcl clark_config {flat|gauss} momentum frac_width
 GetOptions('numEvents=i' => \$numEvents) or die "Bad command line\n";
 
 die usage() unless($#ARGV == 4);
-my ($template, $clarkconf, $shape, $momentum, $fwidth) = @ARGV;
-my $width = $fwidth * $momentum /2.;
+my ($template, $clarkconf, $shape, $momentum, $width) = @ARGV;
 
-my $workdir = basename($template, ('.fcl')) . '_' . $shape . sprintf("_p%.3f", $momentum) . sprintf("_w%.5f", $fwidth);
+my $workdir = basename($template, ('.fcl')) . '_' . $shape . sprintf("_m%.3f", $momentum) . sprintf("_w%.4f", $width);
 mkdir $workdir or die "Can't create directory $workdir: $!\n";
 
 
