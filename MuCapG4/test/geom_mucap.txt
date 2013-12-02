@@ -11,11 +11,13 @@ bool g4.printPhysicsProcessSummary = true;
 double g4.minRangeCut     = 0.010;            // mm
 
 // maximum allowed number of steps per track per event; 0 is unlimited
-int  g4.steppingActionMaxSteps = 0;
+int  g4.steppingActionMaxSteps = 1000000;
 
 // maximum global time per track per event; 0 is unlimited
 double g4.steppingActionMaxGlobalTime = 0.0;
 bool g4.steppingActionSaveSteps = false;
+
+int g4.particlesSizeLimit = 100000;
 
 // times for time virtual detector when particle steps are recorded
 // when the time threshold is crossed in a step
