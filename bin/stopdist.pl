@@ -36,6 +36,7 @@ print $fh "physics.producers.generate.energySpec.spectrum: $shape\n";
 if($shape eq "flat") {
     print $fh "physics.producers.generate.energySpec.center: $momentum\n";
     print $fh "physics.producers.generate.energySpec.halfWidth: $width\n";
+    # NB: FWHM = sigma*sqrt(8 ln(2)) ~= 2.3548 sigma, half width factor 1.1774
 }
 elsif($shape eq 'gauss') {
     print $fh "physics.producers.generate.energySpec.mean: $momentum\n";
