@@ -8,7 +8,7 @@ physics.producers.generate:  {
       variable: momentum
       spectrum: gauss
       mean: 30.1
-      sigma: 0.25
+      sigma: 0.10
    }
    
    position : {
