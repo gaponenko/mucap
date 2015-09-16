@@ -1,10 +1,6 @@
 #!/usr/bin/env python
 #
-# Build a Mu2e base release or test release.
-#
-# $Id$
-# $Author$
-# $Date$
+# Build a Mu2e base release or satellite release.
 #
 # Original author Rob Kutschke.
 #
@@ -25,6 +21,16 @@ AddOption('--mu2elevel',
           default='prof',
           help='Select debug build')
 
+# Tell scons about a new command line option that controls the selection of graphics
+AddOption('--mu2egs',
+          dest='mu2egs',
+          type='string',
+          nargs=1,
+          action='store',
+          metavar='DIR',
+          default='OGL',
+          help='Select graphics system')
+
 # Extract information from the shell environment.
 art_inc       = os.environ['ART_INC']
 art_lib       = os.environ['ART_LIB']
@@ -37,12 +43,12 @@ cppunit_dir   = os.environ['CPPUNIT_DIR']
 gccxml_dir    = os.environ['GCCXML_DIR']
 heppdt_lib    = os.environ['HEPPDT_LIB']
 heppdt_inc    = os.environ['HEPPDT_INC']
-libsigcpp_inc = os.environ['LIBSIGCPP_INC']
-libsigcpp_lib = os.environ['LIBSIGCPP_LIB']
 root_inc      = os.environ['ROOT_INC']
 root_sys      = os.environ['ROOTSYS']
 fhicl_inc     = os.environ['FHICLCPP_INC']
 fhicl_lib     = os.environ['FHICLCPP_LIB']
+sqlite_inc     = os.environ['SQLITE_INC']
+sqlite_lib     = os.environ['SQLITE_LIB']
 cpp0x_inc     = os.environ['CPP0X_INC']
 cpp0x_lib     = os.environ['CPP0X_LIB']
 mesfac_inc     = os.environ['MESSAGEFACILITY_INC']
@@ -52,14 +58,16 @@ cetlib_lib     = os.environ['CETLIB_LIB']
 xercesc_inc    = os.environ['XERCES_C_INC']
 xercesc_root   = os.environ['XERCESCROOT']
 
-# If we are working in a test release, extract more information from the environment.
-if os.environ.has_key('MU2E_TEST_RELEASE'):
-    testrelease          = os.environ['MU2E_TEST_RELEASE']
-    cpppath_frag         = [ testrelease, testrelease + '/BaBar/include' ]
-    libpath_frag         = [ testrelease+'/lib/' ]
+# If we are working in a satellite release, extract more information from the environment.
+if os.environ.has_key('MU2E_SATELLITE_RELEASE'):
+    satelliterelease          = os.environ['MU2E_SATELLITE_RELEASE']
+    cpppath_frag         = [ satelliterelease, satelliterelease + '/BaBar/include' ]
+    libpath_frag         = [ satelliterelease+'/lib/' ]
+    isSatelliteRelease        = 1
 else:
     cpppath_frag         = [ ]
     libpath_frag         = [ ]
+    isSatelliteRelease        = 0
 
 # The link libraries needed when building the BaBar code.
 babarlibs = [ 'mu2e_BaBar_KalmanTrack',     'mu2e_BaBar_DetectorModel',      'mu2e_BaBar_TrkBase',    'mu2e_BaBar_BField',
@@ -69,7 +77,7 @@ babarlibs = [ 'mu2e_BaBar_KalmanTrack',     'mu2e_BaBar_DetectorModel',      'mu
 
 # Define scons-local environment - it will be exported later.
 osenv = {}
-for var in [ 'LD_LIBRARY_PATH',  'GCC_FQ_DIR',  'PATH', 'PYTHONPATH',  'ROOTSYS', 'PYTHON_ROOT', 'PYTHON_DIR', 'SQLITE_DIR' ]:
+for var in [ 'LD_LIBRARY_PATH',  'GCC_FQ_DIR',  'PATH', 'PYTHONPATH',  'ROOTSYS', 'PYTHON_ROOT', 'PYTHON_DIR', 'SQLITE_DIR', 'SQLITE_FQ_DIR' ]:
     if var in os.environ.keys():
         osenv[var] = os.environ[var]
         pass
@@ -81,14 +89,13 @@ env = Environment( CPPPATH=[ cpppath_frag,
                              art_inc,
                              mesfac_inc,
                              fhicl_inc,
+                             sqlite_inc,
                              cetlib_inc,
                              cpp0x_inc,
                              boost_inc,
                              clhep_inc,
                              cppunit_dir+'/include',
                              heppdt_inc,
-                             libsigcpp_inc+'/sigc++-2.0',
-                             libsigcpp_lib+'/sigc++-2.0/include',
                              root_inc,
                              xercesc_inc,
                            ],
@@ -97,13 +104,13 @@ env = Environment( CPPPATH=[ cpppath_frag,
                              art_lib,
                              mesfac_lib,
                              fhicl_lib,
+                             sqlite_lib,
                              cetlib_lib,
                              cpp0x_lib,
                              boost_lib,
                              clhep_lib,
                              cppunit_dir+'/lib',
                              heppdt_lib,
-                             libsigcpp_lib,
                              root_sys+'/lib',
                              '/lib', '/usr/X11R6/lib',
                              xercesc_root+'/lib',
@@ -114,17 +121,7 @@ env = Environment( CPPPATH=[ cpppath_frag,
                  )
 
 # Define the rule for building dictionaries.
-genreflex_flags = '--deep --fail_on_warnings --iocomments --capabilities=classes_ids.cc '\
-                + '-D_REENTRANT -DGNU_SOURCE -DGNU_GCC -D__STRICT_ANSI__ '\
-                + '-DPROJECT_NAME="mu2e" -DPROJECT_VERSION="development"'
-aa="if   t1=`expr ${TARGET} : '\(.*\)_dict.cpp'`;then t2=$${t1}_map.cpp; t1=$${t1}_dict.cpp;"\
-  +"elif t1=`expr ${TARGET} : '\(.*\)_map.cpp'`;then t2=$${t1}_map.cpp; t1=$${t1}_dict.cpp; fi;"\
-  +"if genreflex $SOURCE -s ${SOURCE.srcdir}/classes_def.xml $_CPPINCFLAGS"\
-  +" -o $$t1 "\
-  +genreflex_flags\
-  +"; then mv ${TARGET.dir}/classes_ids.cc $$t2; else rm -f $$t1; false; fi"
-
-genreflex = Builder(action=aa)
+genreflex = Builder(action="./bin/genreflex.sh $SOURCE $TARGET  \"$_CPPINCFLAGS\"")
 env.Append(BUILDERS = {'DictionarySource' : genreflex})
 
 # Get the flag that controls compiler options. Check that it is legal.
@@ -136,9 +133,36 @@ if not level in known_levels:
     print '   The value must be one of the known levels: '  + str(known_levels)
     raise Exception('foo')
 
+graphicssys = GetOption('mu2egs')
+known_gs = ['OGL', 'Qt', 'NOOGL' ]
+if not graphicssys in known_gs:
+    print 'Unrecognized value for --mu2egs ' + graphicssys
+    print '   The value must be one of the known systems: ' + str(known_gs)
+    raise Exception('gs')
+
+# the following may not be needed as the compiler rebuilds it all, but
+# we may still want to "latch" to qt
+
+gsoptfilename='.gsopt'
+if os.path.exists(gsoptfilename):
+    qtf = open(gsoptfilename,'r')
+    rgs = qtf.readline(100)
+    rgs.strip()
+    if graphicssys!=rgs:
+        print 'Inconsitent build; the previous --mu2egs was: ' \
+            + str(rgs) + ' current one is ' + graphicssys
+        print 'inspect (remove?) file: ' +  gsoptfilename + ' or verify option --mu2egs'
+        raise Exception('gs')
+else:
+    if graphicssys == 'Qt' or graphicssys == 'NOOGL':
+        qtf = open(gsoptfilename,'w')
+        qtf.write(graphicssys)
+
+env.Append( MU2EOPTS = [level, graphicssys] );
+
 # Set compile and link flags.
 SetOption('warn', 'no-fortran-cxx-mix')
-env.MergeFlags('-std=c++11')
+env.MergeFlags('-std=c++1y')
 env.MergeFlags('-rdynamic')
 env.MergeFlags('-Wall')
 env.MergeFlags('-Wno-unused-local-typedefs')
@@ -160,7 +184,10 @@ env.gcc_ver=gcc_version.replace('.','')
 # Then guess at the correct location of Spectrum and MLP.
 rootlibs = [ 'Core', 'Cint', 'RIO', 'Net', 'Hist', 'Spectrum', 'MLP', 'Graf', 'Graf3d', 'Gpad', 'Tree',
              'Rint', 'Postscript', 'Matrix', 'Physics', 'MathCore', 'Thread', 'Gui', 'm', 'dl' ]
-env.Append( ROOTLIBS = rootlibs );
+env.Append( ROOTLIBS = rootlibs )
+
+bindir = base+'/bin/'
+env.Append( BINDIR = bindir )
 
 # Make the modified environment visible to all of the SConscript files
 Export('env')
@@ -173,7 +200,8 @@ for root,dirs,files in os.walk('.'):
         pass
     pass
 
-# Define a helper class to construct names of .so libaries. Make an instance of it available to the SConscript files.
+# Define a helper class to construct names of .so libaries. Make an
+# instance of it available to the SConscript files.
 class mu2e_helper:
     """mu2e_helper: class to produce library names"""
 #   This appears to behave like c++ static member and is initialized at class defintion time.
@@ -195,7 +223,11 @@ class mu2e_helper:
                 tokens.pop()
                 pass
             pass
-        return 'mu2e_' + string.join(tokens,'_')
+        prefix = 'mu2e_'
+#        if ( isSatelliteRelease == 1 ):
+#            prefix = 'mu2euser_'
+#            pass
+        return prefix + string.join(tokens,'_')
     def prefixed_libname(self):
         return '#/lib/' + self.libname()
 #
@@ -212,7 +244,8 @@ class mu2e_helper:
     def plugin_cc(self):
         return Glob('*_module.cc', strings=True) + Glob('*_service.cc', strings=True) + Glob('*_source.cc', strings=True)
 #
-#   Build a list of .cc files that are not plugings; these go into the library named after the directory.
+#   Build a list of .cc files that are not plugings; these go into the
+#   library named after the directory.
 #
     def non_plugin_cc(self):
         tmp = non_plugin_cc = Glob('*.cc', strings=True)
@@ -273,7 +306,8 @@ class mu2e_helper:
                            parse_flags=pf
                            )
 #
-#   Make all plugin libraries, excluding _dict and _map; this works if all libraries need the same link list.
+#   Make all plugin libraries, excluding _dict and _map; this works if
+#   all libraries need the same link list.
 #
     def make_plugins( self, userlibs, exclude_cc = [], cppf = [], pf = [] ):
         plugin_cc = self.plugin_cc()
@@ -309,6 +343,29 @@ Export('mu2e_helper')
 
 # Tell scons to operate on all of the SConscript files found by walking the directory tree.
 env.SConscript(ss)
+
+# for -c remove all files from ./tmp and ./lib directories to avoid stale files
+cleanopt = GetOption('clean')
+if (cleanopt and not COMMAND_LINE_TARGETS):
+    print "running with -c and no specific target"
+    print "will also remove all files in tmp and lib directories"
+
+    for top, dirs, files in os.walk("./lib"):
+        for name in files:
+            ff =  os.path.join(top, name)
+            print "removing file ", ff
+            os.unlink (ff)
+
+    for top, dirs, files in os.walk("./tmp"):
+        for name in files:
+            ff =  os.path.join(top, name)
+            print "removing file ", ff
+            os.unlink (ff)
+
+    for ff in ("EventDisplay/src/EventDisplayDict.cc", "EventDisplay/src/EventDisplayDict.h"):
+        if os.path.exists(ff):
+            print "removing file ", ff
+            os.unlink (ff)
 
 # This tells emacs to view this file in python mode.
 # Local Variables:

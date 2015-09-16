@@ -26,7 +26,6 @@
 
 // Mu2e includes
 #include "MCDataProducts/inc/GenParticleCollection.hh"
-#include "Mu2eG4/inc/Mu2eG4RunManager.hh"
 #include "Mu2eG4/inc/WorldMaker.hh"
 #include "Mu2eG4/inc/SensitiveDetectorHelper.hh"
 #include "Mu2eG4/inc/SimParticlePrimaryHelper.hh"
@@ -34,7 +33,6 @@
 #include "Mu2eG4/inc/exportG4PDT.hh"
 #include "GeometryService/inc/GeometryService.hh"
 #include "GeometryService/inc/GeomHandle.hh"
-#include "Mu2eG4/inc/DetectorConstruction.hh"
 #include "Mu2eG4/inc/PrimaryGeneratorAction.hh"
 #include "Mu2eG4/inc/StudyEventAction.hh"
 #include "Mu2eG4/inc/StudySteppingAction.hh"
@@ -45,7 +43,6 @@
 #include "Mu2eG4/inc/physicsListDecider.hh"
 #include "Mu2eG4/inc/postG4InitializeTasks.hh"
 #include "Mu2eG4/inc/Mu2eSensitiveDetector.hh"
-#include "Mu2eG4/inc/MuonMinusConversionAtRest.hh"
 #include "ConfigTools/inc/ConfigFileLookupPolicy.hh"
 #include "SeedService/inc/SeedService.hh"
 #include "Mu2eUtilities/inc/SimParticleCollectionPrinter.hh"
@@ -77,6 +74,7 @@
 #include "G4Timer.hh"
 #include "G4VUserPhysicsList.hh"
 #include "G4SDManager.hh"
+#include "G4RunManager.hh"
 
 // ROOT includes
 #include "TNtuple.h"
@@ -109,7 +107,16 @@ namespace mucap {
     virtual void endRun(art::Run &);
 
   private:
-    unique_ptr<Mu2eG4RunManager> _runManager;
+
+    // the remnants of Mu2eG4RunManager
+
+    // The four functions that call new G4RunManger functions and braeak the BeamOn into 4 pieces.
+    void BeamOnBeginRun( unsigned int runNumber, const char* macroFile=0, G4int n_select=-1);
+    void BeamOnDoOneEvent( int eventNumber );
+    void BeamOnEndEvent();
+    void BeamOnEndRun();
+
+    unique_ptr<G4RunManager> _runManager;
 
     fhicl::ParameterSet _materialPars;
 
@@ -217,7 +224,7 @@ namespace mucap {
 
   // Create an instance of the run manager.
   void MuCapG4::beginJob(){
-    _runManager = unique_ptr<Mu2eG4RunManager>(new Mu2eG4RunManager);
+    _runManager = unique_ptr<G4RunManager>(new G4RunManager);
   }
 
   void MuCapG4::beginRun( art::Run &run){
@@ -241,7 +248,7 @@ namespace mucap {
     }
 
     // Tell G4 that we are starting a new run.
-    _runManager->BeamOnBeginRun( run.id().run() );
+    BeamOnBeginRun( run.id().run() );
 
     // Helps with indexology related to persisting G4 volume information.
     _physVolHelper.beginRun();
@@ -390,9 +397,10 @@ namespace mucap {
 
     _muCapSD->beforeG4Event(muCapChamberHits.get(), &_processInfo, simPartId, event);
 
+
     // Run G4 for this event and access the completed event.
-    _runManager->BeamOnDoOneEvent( event.id().event() );
-    //    G4Event const* g4event = _runManager->getCurrentEvent();
+    BeamOnDoOneEvent( event.id().event() );
+    //G4Event const* g4event = _runManager->GetCurrentEvent();
 
     // Run self consistency checks if enabled.
     _trackingAction->endEvent(*simParticles);
@@ -440,13 +448,13 @@ namespace mucap {
     }   // end !_visMacro.empty()
 
     // This deletes the object pointed to by currentEvent.
-    _runManager->BeamOnEndEvent();
+    BeamOnEndEvent();
 
   }
 
   // Tell G4 that this run is over.
   void MuCapG4::endRun(art::Run & run){
-    _runManager->BeamOnEndRun();
+    BeamOnEndRun();
   }
 
   void MuCapG4::endJob(){
@@ -461,6 +469,48 @@ namespace mucap {
       _processInfo.endRun();
     }
 
+  }
+
+  // Do the "begin run" parts of BeamOn.
+  void MuCapG4::BeamOnBeginRun( unsigned int runNumber, const char* macroFile, G4int n_select){
+
+    _runManager->SetRunIDCounter(runNumber);
+
+    bool cond = _runManager->ConfirmBeamOnCondition();
+    if(!cond){
+      // throw here
+      return;
+    }
+
+    //numberOfEventsToBeProcessed should be the total number of events to be processed 
+    // or a large number and NOT 1 for G4 to work properly
+
+    G4int numberOfEventsToBeProcessed = std::numeric_limits<int>::max(); // largest int for now
+
+    _runManager->SetNumberOfEventsToBeProcessed(numberOfEventsToBeProcessed);// this would have been set by BeamOn
+    _runManager->ConstructScoringWorlds();
+    _runManager->RunInitialization();
+
+    _runManager->InitializeEventLoop(numberOfEventsToBeProcessed,macroFile,n_select);
+
+  }
+
+  // Do the "per event" part of DoEventLoop.
+  void MuCapG4::BeamOnDoOneEvent( int eventNumber){
+    _runManager->ProcessOneEvent(eventNumber);
+  }
+
+  void MuCapG4::BeamOnEndEvent(){
+    _runManager->TerminateOneEvent();
+  }
+
+  // Do the "end of run" parts of DoEventLoop and BeamOn.
+  void MuCapG4::BeamOnEndRun(){
+
+    _runManager->TerminateEventLoop();
+
+    // From G4RunManager::BeamOn.
+    _runManager->RunTermination();
   }
 
 } // End of namespace mucap
