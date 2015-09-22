@@ -119,6 +119,7 @@ namespace mucap {
     Float_t dc_width_[MAXHITS_DC];//[dc_nhits]
     Int_t dc_plane_[MAXHITS_DC];//[dc_nhits]
     Int_t dc_cell_[MAXHITS_DC];//[dc_nhits]
+    Int_t dc_xtalk_[MAXHITS_DC];//[dc_nhits]
 
     //_________________________ MuCapture: All hits - PC  __________________________//
     Int_t pc_nhits_;
@@ -126,6 +127,7 @@ namespace mucap {
     Float_t pc_width_[MAXHITS_PC];//[pc_nhits]
     Int_t pc_plane_[MAXHITS_PC];//[pc_nhits]
     Int_t pc_cell_[MAXHITS_PC];//[pc_nhits]
+    Int_t pc_xtalk_[MAXHITS_PC];//[pc_nhits]
 
     //_________________________ MuCapture: All hits - SC  __________________________//
     Int_t sc_nhits_;
@@ -186,19 +188,21 @@ namespace mucap {
     nt_->Branch("EVID", &evid_, "nrun/I:nevt/I");
     nt_->Branch("Event", &event_, "treeversion/I:timestamp/I:type/I:m12width/F:cptime[3]/F:rftime[3]/F:nwin/I:ntr/I:pienuitr/I");
 
-    TBranch *bdchits = nt_->Branch("DC_hits", 0, "DC_nhits/I:DC_time[DC_nhits]/F:DC_width[DC_nhits]/F:DC_plane[DC_nhits]/I:DC_cell[DC_nhits]/I");
+    TBranch *bdchits = nt_->Branch("DC_hits", 0, "DC_nhits/I:DC_time[DC_nhits]/F:DC_width[DC_nhits]/F:DC_plane[DC_nhits]/I:DC_cell[DC_nhits]/I:DC_xtalk[DC_nhits]/I");
     bdchits->FindLeaf("DC_nhits")->SetAddress(&dc_nhits_);
     bdchits->FindLeaf("DC_time")->SetAddress(&dc_time_);
     bdchits->FindLeaf("DC_width")->SetAddress(&dc_width_);
     bdchits->FindLeaf("DC_plane")->SetAddress(&dc_plane_);
     bdchits->FindLeaf("DC_cell")->SetAddress(&dc_cell_);
+    bdchits->FindLeaf("DC_xtalk")->SetAddress(&dc_xtalk_);
 
-    TBranch *bpchits = nt_->Branch("PC_hits", 0, "PC_nhits/I:PC_time[PC_nhits]/F:PC_width[PC_nhits]/F:PC_plane[PC_nhits]/I:PC_cell[PC_nhits]/I");
+    TBranch *bpchits = nt_->Branch("PC_hits", 0, "PC_nhits/I:PC_time[PC_nhits]/F:PC_width[PC_nhits]/F:PC_plane[PC_nhits]/I:PC_cell[PC_nhits]/I:PC_xtalk[DC_nhits]/I");
     bpchits->FindLeaf("PC_nhits")->SetAddress(&pc_nhits_);
     bpchits->FindLeaf("PC_time")->SetAddress(&pc_time_);
     bpchits->FindLeaf("PC_width")->SetAddress(&pc_width_);
     bpchits->FindLeaf("PC_plane")->SetAddress(&pc_plane_);
     bpchits->FindLeaf("PC_cell")->SetAddress(&pc_cell_);
+    bpchits->FindLeaf("PC_xtalk")->SetAddress(&pc_xtalk_);
 
     TBranch *bschits = nt_->Branch("SC_hits", 0, "SC_nhits/I:SC_time[SC_nhits]/F:SC_width[SC_nhits]/F:SC_iscint[SC_nhits]/I:SC_wire[SC_nhits]/I");
     bschits->FindLeaf("SC_nhits")->SetAddress(&sc_nhits_);
@@ -247,6 +251,7 @@ namespace mucap {
       const WireReadoutId rid = dchits[i].rid();
       dc_plane_[i] = geom_->wpByGlobalNumber(rid.plane().number()).localPlane;
       dc_cell_[i] = rid.channel();
+      dc_xtalk_[i] = 0; // no xtalk in MC
     }
 
     //----------------------------------------------------------------
@@ -264,6 +269,7 @@ namespace mucap {
       const WireReadoutId rid = pchits[i].rid();
       pc_plane_[i] = geom_->wpByGlobalNumber(rid.plane().number()).localPlane;
       pc_cell_[i] = rid.channel();
+      pc_xtalk_[i] = 0; // no xtalk in MC
     }
 
     //----------------------------------------------------------------
