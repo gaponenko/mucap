@@ -155,12 +155,16 @@ physics : {
    }
 
    p1 : [generate, g4run, digiAll ]
-   p2 : [generate, g4run, muonFilter, digiMuon ]
-   p3 : [generate, g4run, muonEMCascadeDaughters, noEMCascadeFilter, digiNoEMCascade ]
-   e1 : [mcparticles, mchits, outfile]
-//, clarkdumper]
 
-   trigger_paths  : [p1, p2, p3]
+   p2a : [generate, g4run, muonFilter, digiMuon ]
+   p2b : [generate, g4run, "!muonFilter", digiMuon ]
+
+   p3a : [generate, g4run, muonEMCascadeDaughters, noEMCascadeFilter, digiNoEMCascade ]
+   p3b : [generate, g4run, muonEMCascadeDaughters, "!noEMCascadeFilter", digiNoEMCascade ]
+
+   e1 : [mcparticles, mchits, outfile]
+
+   trigger_paths  : [p1, p2a, p2b, p3a, p3b]
    end_paths      : [e1]
 
 }
