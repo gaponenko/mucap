@@ -7,11 +7,11 @@ BEGIN_PROLOG
 //================================================================
 mucapMaterials : {
     // History plots: https://twist.triumf.ca/~e614/forum/view.php?site=twist&bn=twist_physics&key=1385659065
-    PTorr: 750 // To match G3. History value ~752.5 Torr
-    TCelsius : 31 // to match G3. History value ~26.5 C
+    PTorr: 753.0 // To match G3. History value ~752.5 Torr
+    TCelsius : 29.0 // to match G3. History value ~26.5 C
     pcGasCF4VolumeFraction : 0.8
-    cradleGasN2VolumeFraction : 0.03
-    gabsGasCO2VolumeFraction : 0.82
+    cradleGasN2VolumeFraction : 0.03  // GCAP 0.03
+    gabsGasCO2VolumeFraction : 0.048  // GABS
     tecGasPressure: 60 // Torr
     printElements : false
     printMaterials : false
