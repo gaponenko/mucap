@@ -30,14 +30,14 @@ source : {
 services : {
 
    message               : @local::default_message
-   TFileService          : { fileName : "hist_muonStopStudy.root" }
+   TFileService          : { fileName : "nts.owner.muonStopStudy.version.sequencer.root" }
    RandomNumberGenerator : { }
 
    GeometryService        : { inputFile      : "MuCapG4/test/geom_mucap.txt"  }
    ConditionsService      : { conditionsfile : "Mu2eG4/test/conditions_01.txt"      }
    GlobalConstantsService : { inputFile      : "Mu2eG4/test/globalConstants_01.txt" }
    G4Helper               : { }
-   SeedService            : @local::automaticSeeds
+   user: { SeedService            : @local::automaticSeeds }
 
    Geometry : @local::mucapGeometry
 }
@@ -172,7 +172,7 @@ physics : {
 outputs: {
    outfile : {
       module_type   :   RootOutput
-      fileName      :   "data_muonStopStudy.art"
+      fileName      :   "sim.owner.muonStopStudy.version.sequencer.art"
    }
 }
 
@@ -189,8 +189,8 @@ services.message.destinations.log.categories.ArtReport.limit : 1
 services.message.destinations.log.categories.ArtReport.timespan : 60
 
 // Initialze seeding of random engines: do not put these lines in base .fcl files for grid jobs.
-services.SeedService.baseSeed         :  0
-services.SeedService.maxUniqueEngines :  20
+services.user.SeedService.baseSeed         :  0
+services.user.SeedService.maxUniqueEngines :  20
 
 // This tells emacs to view this file in the JavaScript mode.
 // Local Variables:
