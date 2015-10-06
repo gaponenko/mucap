@@ -50,5 +50,7 @@ user_root=`dirname $bin_dir`
 add_to_var $user_root/lib    LD_LIBRARY_PATH
 add_to_var $user_root/Config PYTHONPATH
 add_to_var $user_root/bin    PATH
+add_to_var $user_root        MU2E_SEARCH_PATH
+add_to_var $user_root        FHICL_FILE_PATH
 
 unset bin_dir user_root
